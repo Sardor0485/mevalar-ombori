@@ -3,47 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimal Bright Dashboard</title>
+    <title>Pro Ombor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
-        .card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .btn-action { transition: 0.2s; padding: 4px 12px; border-radius: 8px; font-size: 12px; }
     </style>
 </head>
 <body class="p-4 md:p-10">
 
 <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
-        <button onclick="exportToExcel()" class="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition">Export Excel</button>
-    </div>
+    <form action="/meva/qoshish" method="POST" class="card p-6 mb-8 flex flex-wrap gap-4 items-center">
+        <input type="text" name="nomi" placeholder="Meva nomi" class="p-3 bg-slate-50 rounded-xl outline-none flex-1" required>
+        <input type="number" name="narxi" placeholder="Narxi" class="p-3 bg-slate-50 rounded-xl outline-none w-32" required>
+        <input type="number" name="soni" placeholder="Soni" class="p-3 bg-slate-50 rounded-xl outline-none w-32" required>
+        <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700">Qo'shish</button>
+    </form>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="md:col-span-2 card p-6 shadow-sm">
-            <canvas id="mevaChart" height="100"></canvas>
-        </div>
-        <div class="card p-6 shadow-sm flex flex-col justify-center items-center bg-indigo-50 border-indigo-100">
-            <span class="text-indigo-400 text-sm font-bold uppercase">Umumiy Qiymat</span>
-            <div id="totalSum" class="text-4xl font-black text-indigo-900 mt-2">0</div>
-        </div>
-    </div>
-
-    <div class="card p-6 shadow-sm overflow-x-auto">
-        <input type="text" id="searchInput" placeholder="Meva nomini izlash..." class="w-full mb-6 p-4 bg-slate-50 rounded-2xl outline-none border border-slate-100">
+    <div class="card p-6 overflow-x-auto">
         <table class="w-full text-left" id="mevaTable">
             <thead><tr class="text-slate-400 text-xs uppercase">
-                <th class="p-4">Tanlash</th><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th>
+                <th class="p-4">Tanlash</th><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Amallar</th>
             </tr></thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="hover:bg-indigo-50/50 transition border-t border-slate-50">
+                <tr class="border-t border-slate-50 hover:bg-slate-50">
                     <td class="p-4"><input type="checkbox" class="rowCheckbox w-5 h-5 accent-indigo-600" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
-                    <td class="p-4 font-medium text-slate-700"><%= m.nomi %></td>
-                    <td class="p-4 text-slate-500 font-mono"><%= m.narxi %></td>
-                    <td class="p-4 text-slate-500"><%= m.soni %></td>
+                    <td class="p-4 font-medium"><%= m.nomi %></td>
+                    <td class="p-4"><%= m.narxi %></td>
+                    <td class="p-4"><%= m.soni %></td>
+                    <td class="p-4 flex gap-2">
+                        <button onclick="editMeva('<%= m.id %>')" class="bg-blue-100 text-blue-600 btn-action hover:bg-blue-200">Edit</button>
+                        <a href="/meva/ochirish/<%= m.id %>" class="bg-red-100 text-red-600 btn-action hover:bg-red-200">Delete</a>
+                    </td>
                 </tr>
                 <% }) %>
             </tbody>
@@ -52,46 +45,16 @@
 </div>
 
 <script>
-    // Chart.js - Yorqin ranglar
-    const ctx = document.getElementById('mevaChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
-            datasets: [{
-                label: 'Narxlar',
-                data: <%- JSON.stringify(mevalar.map(m => m.narxi)) %>,
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-
-    // Qidiruv
-    document.getElementById('searchInput').addEventListener('keyup', e => {
-        const val = e.target.value.toLowerCase();
-        document.querySelectorAll('tbody tr').forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
-        });
-    });
-
-    // Summa
-    document.querySelectorAll('.rowCheckbox').forEach(cb => {
-        cb.addEventListener('change', () => {
-            let total = 0;
-            document.querySelectorAll('.rowCheckbox:checked').forEach(c => {
-                total += (parseFloat(c.dataset.price) * parseFloat(c.dataset.count));
-            });
-            document.getElementById('totalSum').innerText = total.toLocaleString();
-        });
-    });
-
-    function exportToExcel() {
-        const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
-        XLSX.writeFile(wb, "Data.xlsx");
+    function editMeva(id) {
+        const soni = prompt("Yangi sonini kiriting:");
+        const narxi = prompt("Yangi narxini kiriting:");
+        if (soni && narxi) {
+            fetch(`/meva/tahrirlash/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soni, narxi })
+            }).then(() => location.reload());
+        }
     }
 </script>
 </body>
