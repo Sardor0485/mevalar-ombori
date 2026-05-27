@@ -2,51 +2,48 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>Minimal Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Bright Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .card { background: #ffffff; border: 1px solid #f0f0f0; border-radius: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; }
     </style>
 </head>
-<body class="bg-[#FAFAFA] p-6 md:p-12">
+<body class="p-4 md:p-10">
 
-<div class="max-w-5xl mx-auto">
-    <div class="flex justify-between items-end mb-10">
-        <div>
-            <h1 class="text-3xl font-semibold text-gray-900">Ombor</h1>
-            <p class="text-gray-400">Minimalist boshqaruv paneli</p>
-        </div>
-        <button onclick="exportToExcel()" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition">Yuklab olish ↗</button>
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
+        <button onclick="exportToExcel()" class="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition">Export Excel</button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="card p-6 shadow-sm">
-            <span class="text-gray-400 text-xs uppercase tracking-widest">Jami Summa</span>
-            <div class="text-2xl font-semibold mt-1" id="totalSum">0</div>
+        <div class="md:col-span-2 card p-6 shadow-sm">
+            <canvas id="mevaChart" height="100"></canvas>
+        </div>
+        <div class="card p-6 shadow-sm flex flex-col justify-center items-center bg-indigo-50 border-indigo-100">
+            <span class="text-indigo-400 text-sm font-bold uppercase">Umumiy Qiymat</span>
+            <div id="totalSum" class="text-4xl font-black text-indigo-900 mt-2">0</div>
         </div>
     </div>
 
-    <input type="text" id="searchInput" placeholder="Qidirish..." class="w-full bg-white border border-gray-100 rounded-xl p-4 mb-6 shadow-sm outline-none focus:border-blue-200 transition">
-
-    <div class="card p-2 overflow-x-auto">
-        <table class="w-full text-left border-collapse" id="mevaTable">
-            <thead>
-                <tr class="text-gray-400 text-xs uppercase">
-                    <th class="p-4">Tanlash</th>
-                    <th class="p-4">Nomi</th>
-                    <th class="p-4">Narxi</th>
-                    <th class="p-4">Soni</th>
-                </tr>
-            </thead>
+    <div class="card p-6 shadow-sm overflow-x-auto">
+        <input type="text" id="searchInput" placeholder="Meva nomini izlash..." class="w-full mb-6 p-4 bg-slate-50 rounded-2xl outline-none border border-slate-100">
+        <table class="w-full text-left" id="mevaTable">
+            <thead><tr class="text-slate-400 text-xs uppercase">
+                <th class="p-4">Tanlash</th><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th>
+            </tr></thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="hover:bg-gray-50 transition border-t border-gray-50">
-                    <td class="p-4"><input type="checkbox" class="rowCheckbox w-4 h-4 accent-blue-500" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
-                    <td class="p-4 font-medium text-gray-700"><%= m.nomi %></td>
-                    <td class="p-4 text-gray-500"><%= m.narxi %></td>
-                    <td class="p-4 text-gray-500"><%= m.soni %></td>
+                <tr class="hover:bg-indigo-50/50 transition border-t border-slate-50">
+                    <td class="p-4"><input type="checkbox" class="rowCheckbox w-5 h-5 accent-indigo-600" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
+                    <td class="p-4 font-medium text-slate-700"><%= m.nomi %></td>
+                    <td class="p-4 text-slate-500 font-mono"><%= m.narxi %></td>
+                    <td class="p-4 text-slate-500"><%= m.soni %></td>
                 </tr>
                 <% }) %>
             </tbody>
@@ -54,8 +51,25 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+    // Chart.js - Yorqin ranglar
+    const ctx = document.getElementById('mevaChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
+            datasets: [{
+                label: 'Narxlar',
+                data: <%- JSON.stringify(mevalar.map(m => m.narxi)) %>,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
     // Qidiruv
     document.getElementById('searchInput').addEventListener('keyup', e => {
         const val = e.target.value.toLowerCase();
@@ -71,13 +85,13 @@
             document.querySelectorAll('.rowCheckbox:checked').forEach(c => {
                 total += (parseFloat(c.dataset.price) * parseFloat(c.dataset.count));
             });
-            document.getElementById('totalSum').innerText = total.toLocaleString() + " so'm";
+            document.getElementById('totalSum').innerText = total.toLocaleString();
         });
     });
 
     function exportToExcel() {
         const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
-        XLSX.writeFile(wb, "Report.xlsx");
+        XLSX.writeFile(wb, "Data.xlsx");
     }
 </script>
 </body>
