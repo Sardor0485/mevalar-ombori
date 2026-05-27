@@ -3,39 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Ombor</title>
+    <title>Ixcham Ombor</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
-        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; }
-        .btn-action { transition: 0.2s; padding: 4px 12px; border-radius: 8px; font-size: 12px; }
+        body { font-family: sans-serif; font-size: 14px; color: #1e293b; background: #f1f5f9; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
+        input, button { font-size: 14px !important; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-4">
 
-<div class="max-w-6xl mx-auto">
-    <form action="/meva/qoshish" method="POST" class="card p-6 mb-8 flex flex-wrap gap-4 items-center">
-        <input type="text" name="nomi" placeholder="Meva nomi" class="p-3 bg-slate-50 rounded-xl outline-none flex-1" required>
-        <input type="number" name="narxi" placeholder="Narxi" class="p-3 bg-slate-50 rounded-xl outline-none w-32" required>
-        <input type="number" name="soni" placeholder="Soni" class="p-3 bg-slate-50 rounded-xl outline-none w-32" required>
-        <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700">Qo'shish</button>
+<div class="max-w-5xl mx-auto">
+    <form action="/meva/qoshish" method="POST" class="card p-4 mb-4 flex gap-2 flex-wrap shadow-sm">
+        <input type="text" name="nomi" placeholder="Nomi" class="border p-2 rounded flex-1 min-w-[120px]" required>
+        <input type="number" name="narxi" placeholder="Narx" class="border p-2 rounded w-20" required>
+        <input type="number" name="soni" placeholder="Soni" class="border p-2 rounded w-20" required>
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded">Qo'shish</button>
     </form>
 
-    <div class="card p-6 overflow-x-auto">
+    <div class="grid md:grid-cols-3 gap-4">
+        <div class="card p-4 md:col-span-2 shadow-sm">
+            <canvas id="mevaChart" height="80"></canvas>
+        </div>
+        <div class="card p-4 shadow-sm flex flex-col justify-center items-center">
+            <span class="text-gray-500 uppercase text-[10px] font-bold">Jami Qiymat</span>
+            <div id="totalSum" class="text-2xl font-bold text-indigo-700">0</div>
+        </div>
+    </div>
+
+    <div class="card p-4 mt-4 shadow-sm overflow-x-auto">
         <table class="w-full text-left" id="mevaTable">
-            <thead><tr class="text-slate-400 text-xs uppercase">
-                <th class="p-4">Tanlash</th><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Amallar</th>
+            <thead><tr class="text-gray-400 text-[10px] uppercase">
+                <th class="p-2">Tanlash</th><th>Nomi</th><th>Narx</th><th>Soni</th><th>Amallar</th>
             </tr></thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="border-t border-slate-50 hover:bg-slate-50">
-                    <td class="p-4"><input type="checkbox" class="rowCheckbox w-5 h-5 accent-indigo-600" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
-                    <td class="p-4 font-medium"><%= m.nomi %></td>
-                    <td class="p-4"><%= m.narxi %></td>
-                    <td class="p-4"><%= m.soni %></td>
-                    <td class="p-4 flex gap-2">
-                        <button onclick="editMeva('<%= m.id %>')" class="bg-blue-100 text-blue-600 btn-action hover:bg-blue-200">Edit</button>
-                        <a href="/meva/ochirish/<%= m.id %>" class="bg-red-100 text-red-600 btn-action hover:bg-red-200">Delete</a>
+                <tr class="border-t text-sm">
+                    <td class="p-2"><input type="checkbox" class="rowCheckbox" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
+                    <td class="p-2 font-medium"><%= m.nomi %></td>
+                    <td class="p-2"><%= m.narxi %></td>
+                    <td class="p-2"><%= m.soni %></td>
+                    <td class="p-2 flex gap-1">
+                        <button onclick="editMeva('<%= m.id %>')" class="text-blue-600 hover:underline">Edit</button>
+                        <a href="/meva/ochirish/<%= m.id %>" class="text-red-600 hover:underline">Del</a>
                     </td>
                 </tr>
                 <% }) %>
@@ -45,15 +56,31 @@
 </div>
 
 <script>
+    new Chart(document.getElementById('mevaChart'), {
+        type: 'bar',
+        data: {
+            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
+            datasets: [{ label: 'Narx', data: <%- JSON.stringify(mevalar.map(m => m.narxi)) %>, backgroundColor: '#4f46e5' }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    // Summa funksiyasi
+    document.querySelectorAll('.rowCheckbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+            let total = 0;
+            document.querySelectorAll('.rowCheckbox:checked').forEach(c => {
+                total += (c.dataset.price * c.dataset.count);
+            });
+            document.getElementById('totalSum').innerText = total.toLocaleString();
+        });
+    });
+
     function editMeva(id) {
-        const soni = prompt("Yangi sonini kiriting:");
-        const narxi = prompt("Yangi narxini kiriting:");
+        const soni = prompt("Yangi soni:");
+        const narxi = prompt("Yangi narxi:");
         if (soni && narxi) {
-            fetch(`/meva/tahrirlash/${id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ soni, narxi })
-            }).then(() => location.reload());
+            fetch(`/meva/tahrirlash/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ soni, narxi }) }).then(() => location.reload());
         }
     }
 </script>
