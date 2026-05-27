@@ -3,126 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mevalar Ombori</title>
+    <title>Mevalar Ombori — Premium Dashboard</title>
     <style>
+        /* Eng zamonaviy va nafis shrift */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Mevali zamonaviy ranglar palitrasi */
+            --primary: #10b981; /* Olma yashili */
+            --primary-glow: rgba(16, 185, 129, 0.15);
+            --accent: #f97316; /* Apelsin rang */
+            --accent-glow: rgba(249, 115, 22, 0.15);
+            --danger: #ef4444; /* Qulupnay qizili */
+            --danger-glow: rgba(239, 68, 68, 0.1);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f9fbf9; /* Mayin tabiiy och yashil-oq fon */
-            color: #2d3748;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(249, 115, 22, 0.05) 0px, transparent 50%);
+            color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 50px 20px;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-sizing: border-box;
         }
 
         .container {
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Header */
+        /* Premium Glassmorphism Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 35px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 22px;
-            font-weight: 600;
-            margin: 0;
-            color: #2f855a; /* Toza o'rmon yashili */
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logout-btn {
-            font-size: 13px;
-            color: #718096;
-            text-decoration: none;
-            padding: 6px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            color: #c53030; /* Qulupnay qizili */
-            border-color: #feb2b2;
-            background: #fff5f5;
-        }
-
-        /* Forma kartasi */
-        .form-card {
-            background: white;
-            padding: 20px 25px;
-            border-radius: 12px;
-            border: 1px solid #edf2f7;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 20px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
             margin-bottom: 30px;
         }
 
-        .form-card h3 {
-            margin: 0 0 15px 0;
-            font-size: 13px;
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, #047857, #c2410c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            font-size: 14px;
             font-weight: 600;
-            color: #4a5568;
+            color: var(--danger);
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 8px 20px var(--danger-glow);
+            transform: translateY(-1px);
+        }
+
+        /* Zamonaviy Forma Karti */
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 35px;
+        }
+
+        .card h3 {
+            margin: 0 0 20px 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .form-group {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
         .form-group input {
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-family: inherit;
             flex: 1;
-            min-width: 160px;
+            min-width: 180px;
             outline: none;
-            transition: all 0.2s;
-            background: #f7fafc;
+            background: white;
+            transition: all 0.3s ease;
         }
 
         .form-group input:focus {
-            border-color: #48bb78; /* Meva yashili */
-            background: white;
-            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         .btn-add {
-            background: #38a169;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
 
         .btn-add:hover {
-            background: #2f855a;
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--primary-glow);
         }
 
-        /* Jadval paneli */
-        .table-wrapper {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #edf2f7;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+        /* Elegant Jadval (Table) */
+        .table-container {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
 
@@ -132,21 +174,20 @@
         }
 
         th {
-            background: #f7fafc;
-            color: #4a5568;
-            font-size: 12px;
+            background: rgba(248, 250, 252, 0.6);
+            color: var(--text-muted);
+            font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
-            padding: 14px 20px;
-            border-bottom: 1px solid #edf2f7;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
             letter-spacing: 0.5px;
-            text-align: left;
         }
 
         td {
-            padding: 14px 20px;
-            border-bottom: 1px solid #f7fafc;
-            font-size: 14px;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            font-size: 15px;
             vertical-align: middle;
         }
 
@@ -154,68 +195,100 @@
             border-bottom: none;
         }
 
-        .meva-title {
-            font-weight: 500;
-            color: #2d3748;
-            font-size: 15px;
+        tr:hover td {
+            background: rgba(248, 250, 252, 0.4);
         }
 
-        /* Inline tahrirlash formasi */
+        .meva-badge {
+            background: rgba(16, 185, 129, 0.08);
+            color: #065f46;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Kuchaytirilgan Jonli Tahrirlash Formasi */
         .edit-form {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        .edit-form .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .edit-form input {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
             width: 90px;
-            font-size: 13px;
+            font-size: 14px;
+            font-family: inherit;
             outline: none;
-            transition: border-color 0.2s;
+            background: white;
+            transition: all 0.2s ease;
         }
 
         .edit-form input:focus {
-            border-color: #48bb78;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .unit-label {
+            margin-left: 5px;
+            margin-right: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .btn-update {
             background: white;
-            border: 1px solid #cbd5e0;
-            color: #4a5568;
-            padding: 5px 12px;
-            border-radius: 6px;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
         .btn-update:hover {
-            background: #f0fff4;
-            border-color: #38a169;
-            color: #276749;
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(249, 115, 22, 0.02);
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
 
-        /* O'chirish havolasi */
+        /* O'chirish (Delete) harakati */
         .btn-delete {
-            color: #a0aec0;
+            color: #94a3b8;
             text-decoration: none;
-            font-size: 13px;
-            transition: color 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
         }
 
         .btn-delete:hover {
-            color: #e53e3e;
+            color: var(--danger);
         }
 
         .no-data {
             text-align: center;
-            color: #718096;
-            padding: 40px !important;
-            font-size: 14px;
+            color: var(--text-muted);
+            padding: 50px !important;
+            font-style: italic;
+        }
+
+        /* Chiroyli ochilish animatsiyasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -223,51 +296,57 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍓 Mevalar Ombori Paneli</h1>
+        <h1>🌿 Mevalar Ombori <span style="font-size: 14px; color: var(--text-muted); font-weight: 400; background: #e2e8f0; padding: 4px 10px; border-radius: 8px;">PRO</span></h1>
         <a href="/logout" class="logout-btn">Chiqish 🚪</a>
     </div>
 
-    <div class="form-card">
-        <h3>🍋 Yangi mahsulot kiritish</h3>
+    <div class="card">
+        <h3>🍊 Yangi mahsulot kiritish paneli</h3>
         <form action="/meva/qoshish" method="POST" class="form-group">
-            <input type="text" name="nomi" placeholder="Meva nomi (Masalan: Behi)" required>
+            <input type="text" name="nomi" placeholder="Meva nomi (Masalan: Shaftoli)" required>
             <input type="number" name="soni" placeholder="Soni (ta)" min="0" required>
             <input type="number" name="narxi" placeholder="Narxi (so'm)" min="0" required>
             <button type="submit" class="btn-add">Omborga qo'shish</button>
         </form>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 60px;">ID</th>
-                    <th>Nomi</th>
-                    <th>Miqdori va narxi (Tahrirlash)</th>
-                    <th style="width: 90px; text-align: right;">Amal</th>
+                    <th style="width: 70px;">ID</th>
+                    <th>Mahsulot</th>
+                    <th>Zaxira va Narxni boshqarish</th>
+                    <th style="width: 100px; text-align: right;">Amal</th>
                 </tr>
             </thead>
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
                     <% mevalar.forEach(meva => { %>
                         <tr>
-                            <td style="color: #a0aec0;">#<%= meva.id %></td>
-                            <td><span class="meva-title">🍏 <%= meva.nomi %></span></td>
+                            <td style="color: var(--text-muted); font-weight: 500;">#<%= meva.id %></td>
+                            <td><span class="meva-badge">🍏 <%= meva.nomi %></span></td>
                             <td>
                                 <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
-                                    <input type="number" name="soni" value="<%= meva.soni %>" required> <span style="color: #a0aec0; font-size: 13px;">ta</span>
-                                    <input type="number" name="narxi" value="<%= meva.narxi %>" required> <span style="color: #a0aec0; font-size: 13px;">so'm</span>
+                                    <div class="input-wrapper">
+                                        <input type="number" name="soni" value="<%= meva.soni %>" required>
+                                        <span class="unit-label">ta</span>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input type="number" name="narxi" value="<%= meva.narxi %>" required>
+                                        <span class="unit-label">so'm</span>
+                                    </div>
                                     <button type="submit" class="btn-update">Saqlash</button>
                                 </form>
                             </td>
                             <td style="text-align: right;">
-                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-delete" onclick="return confirm('Haqiqatdan ham o\'chirilsinmi?')">O'chirish</a>
+                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-delete" onclick="return confirm('Ushbu mevani o\'chirishni xohlaysizmi?')">O'chirish</a>
                             </td>
                         </tr>
                     <% }) %>
                 <% } else { %>
                     <tr>
-                        <td colspan="4" class="no-data">📦 Omborda mevalar tugadi. Yuqoridan yangi meva qo'shing.</td>
+                        <td colspan="4" class="no-data">📦 Omborda mevalar mavjud emas. Yuqoridagi formadan foydalaning.</td>
                     </tr>
                 <% } %>
             </tbody>
