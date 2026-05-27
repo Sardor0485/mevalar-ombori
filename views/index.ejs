@@ -2,83 +2,52 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ombor Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { background: #f8f9fa; font-size: 14px; }
-        .card { border-radius: 8px; padding: 10px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .table-wrapper { max-height: 350px; overflow: auto; border: 1px solid #dee2e6; border-radius: 5px; }
-        table { min-width: 450px; }
-        .excel-input { border: none; width: 100%; padding: 4px; background: transparent; text-align: center; }
-        .alert-danger-row { background-color: #ffe6e6 !important; }
-        .sticky-total { position: fixed; bottom: 0; left: 0; width: 100%; background: #198754; color: white; padding: 10px; text-align: center; font-weight: bold; z-index: 1000; }
+        .table-wrapper { max-height: 400px; overflow: auto; border: 1px solid #dee2e6; }
+        .excel-input { width: 70px; border: none; background: transparent; }
+        .alert-danger-row { background-color: #ffdada !important; }
     </style>
 </head>
-<body class="pb-5">
-
-<div class="container-fluid p-2">
-    <div class="card"><canvas id="myChart" style="max-height: 100px;"></canvas></div>
-
-    <div class="card">
+<body class="p-3">
+    <div class="card p-2 mb-3"><canvas id="myChart" style="max-height: 100px;"></canvas></div>
+    <div class="card p-2">
         <input type="text" id="searchInput" class="form-control mb-2" placeholder="🔍 Qidirish..." onkeyup="filterTable()">
-        <button onclick="exportTable()" class="btn btn-sm btn-success w-100">📥 Excelga yuklash</button>
+        <div class="table-wrapper">
+            <table class="table table-sm table-hover" id="omborTable">
+                <thead><tr><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Amal</th></tr></thead>
+                <tbody id="tableBody">
+                    <% mevalar.forEach((m) => { %>
+                    <tr id="row-<%= m.id %>" class="<%= m.soni < 5 ? 'alert-danger-row' : '' %>">
+                        <td><%= m.nomi %></td>
+                        <td><input type="number" id="soni-<%= m.id %>" value="<%= m.soni %>" class="excel-input"></td>
+                        <td><input type="number" id="narxi-<%= m.id %>" value="<%= m.narxi %>" class="excel-input"></td>
+                        <td><button onclick="save('<%= m.id %>', '<%= m.nomi %>')" class="btn btn-sm btn-primary">💾</button></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <button onclick="exportTable()" class="btn btn-success mt-2">📥 Excel</button>
     </div>
-
-    <div class="card table-wrapper">
-        <table class="table table-sm table-hover align-middle" id="omborTable">
-            <thead class="table-light">
-                <tr><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Amal</th></tr>
-            </thead>
-            <tbody id="tableBody">
-                <% mevalar.forEach((meva) => { %>
-                <tr id="row-<%= meva.id %>" class="<%= meva.soni < 5 ? 'alert-danger-row' : '' %>">
-                    <td><%= meva.nomi %></td>
-                    <td><input type="number" id="soni-<%= meva.id %>" value="<%= meva.soni %>" class="excel-input"></td>
-                    <td><input type="number" id="narxi-<%= meva.id %>" value="<%= meva.narxi %>" class="excel-input"></td>
-                    <td><button onclick="saveChanges('<%= meva.id %>', '<%= meva.nomi %>')" class="btn btn-sm btn-primary">💾</button></td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="sticky-total" id="totalDisplay">Ombor Pro Tizimi</div>
 
 <script>
-    // Grafik
-    const ctx = document.getElementById('myChart').getContext('2d');
-    let myChart = new Chart(ctx, { type: 'doughnut', data: { labels: [<%- mevalar.map(m => `'${m.nomi}'`).join(',') %>], datasets: [{ data: [<%- mevalar.map(m => m.soni).join(',') %>], backgroundColor: ['#0d6efd', '#198754', '#dc3545', '#fd7e14'] }] } });
-
-    // AJAX Tahrirlash
-    function saveChanges(id, nomi) {
-        let soni = document.getElementById('soni-'+id).value;
-        let narxi = document.getElementById('narxi-'+id).value;
+    function save(id, nomi) {
         fetch('/meva/tahrirlash/'+id, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ soni, narxi })
-        }).then(res => {
-            if(res.ok) {
-                document.getElementById('row-' + id).className = (soni < 5) ? 'alert-danger-row' : '';
-                alert("Muvaffaqiyatli saqlandi!");
-            }
-        });
+            body: JSON.stringify({ soni: document.getElementById('soni-'+id).value, narxi: document.getElementById('narxi-'+id).value })
+        }).then(() => alert("Saqlandi!"));
     }
-
-    // Qidiruv
     function filterTable() {
         let val = document.getElementById("searchInput").value.toUpperCase();
         document.querySelectorAll("#tableBody tr").forEach(tr => tr.style.display = tr.innerText.toUpperCase().includes(val) ? "" : "none");
     }
-
-    // Excel
-    function exportTable() {
-        XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById('omborTable')), "Ombor.xlsx");
-    }
+    function exportTable() { XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById('omborTable')), "Ombor.xlsx"); }
 </script>
 </body>
 </html>
