@@ -8,9 +8,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
 
-        /* DIZAYN QIYSHAYMASLIGI UCHUN GLOBAL SOZLAMALAR */
         *, *::before, *::after {
-            box-sizing: border-box; /* Elementlar chetga chiqib ketishini to'liq to'sadi */
+            box-sizing: border-box;
         }
 
         body {
@@ -29,7 +28,7 @@
             max-width: 900px; 
         }
 
-        /* TEPADAGI NAV BAR */
+        /* NAVBAR */
         .top-nav {
             display: flex;
             justify-content: flex-end;
@@ -45,7 +44,7 @@
         }
         .btn-main:hover { background: #059669; }
 
-        /* ANALITIKA BLOKI (GEOMETRIK IDEAL VA TEKIS) */
+        /* ANALITIKA PANELI */
         .analytics-card {
             background: #ffffff;
             border-radius: 12px;
@@ -55,7 +54,6 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* MEVALAR RO'YXATI (LEGEND) */
         .custom-legend {
             display: flex;
             flex-wrap: wrap;
@@ -80,42 +78,41 @@
             flex-shrink: 0;
         }
 
-        /* FLEXBOX ROW - ELEMENTLARNI DOIMO BIR CHIZIQDA SAQLAYDI */
         .chart-row {
             display: flex;
             align-items: center;
             justify-content: space-around;
             gap: 15px;
-            flex-wrap: wrap; /* Kichik ekranlarda tartib bilan pastga tushadi, qiyshaymaydi */
+            flex-wrap: wrap;
         }
         
         .chart-container-box {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             position: relative;
             flex-shrink: 0;
         }
 
-        /* JONLI AXBOROT OYNASI */
+        /* JONLI INTERAKTIV OYNA */
         .chart-info-display {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #10b981; /* Bir oz urg'u berildi */
             border-radius: 8px;
-            padding: 10px 14px;
-            min-width: 170px;
+            padding: 12px 16px;
+            min-width: 180px;
             text-align: left;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.05);
         }
-        .info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
-        .info-value { font-size: 14px; font-weight: 700; color: #10b981; }
+        .info-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .info-value { font-size: 15px; font-weight: 700; color: #10b981; }
 
-        /* TOTAL REKORD */
+        /* TOTAL */
         .total-box {
             text-align: right;
             min-width: 120px;
         }
         .total-label { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-        .total-value { font-size: 20px; font-weight: 800; color: #10b981; }
+        .total-value { font-size: 22px; font-weight: 800; color: #10b981; }
 
         /* QIDIRUV */
         .search-row { margin-bottom: 8px; position: relative; width: 100%; }
@@ -127,10 +124,10 @@
         .search-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
         .search-icon { position: absolute; left: 14px; top: 12px; color: #94a3b8; font-size: 16px; }
 
-        /* JADVALNI REZINA KABI REAKSION QILUVCHI KONTEYNER */
+        /* REAKSION JADVAL */
         .table-wrapper {
             width: 100%;
-            overflow-x: auto; /* Mobil ekranda jadval siqilib qiyshaymaydi, o'ngga suriladi */
+            overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             background: #fff; 
             border-radius: 12px; 
@@ -142,14 +139,13 @@
             width: 100%; 
             border-collapse: collapse; 
             font-size: 17px; 
-            min-width: 600px; /* Jadval o'zining baquvvat shaklini saqlab qoladi */
+            min-width: 600px;
         }
         
         th { background: #f8fafc; padding: 12px 14px; text-align: left; color: #475569; font-weight: 800; font-size: 16px; border-bottom: 2px solid #e2e8f0; }
         td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         
-        /* INPUTLAR */
         .borderless-input {
             border: 1px solid transparent; background: transparent;
             padding: 4px 6px; font-size: 17px; width: 85px; outline: none;
@@ -159,7 +155,7 @@
 
         .check-custom { width: 22px; height: 22px; accent-color: #10b981; cursor: pointer; }
 
-        /* SMAYLIK TUGMALARI */
+        /* SMAINIK TUGMALAR */
         .actions-group { display: flex; gap: 8px; justify-content: flex-end; }
         
         .btn-emoji-edit {
@@ -308,14 +304,14 @@
         `;
     });
 
-    // Birinchi mevani yuklanganda srazi ko'rsatish
+    // Yuklanganda birinchi mevani chiqarib qo'yish
     if(labels.length > 0) {
         document.getElementById('infoFruitName').innerText = labels;
         document.getElementById('infoFruitCount').innerText = data + " ta mavjud";
     }
 
     const ctx = document.getElementById('miniChart').getContext('2d');
-    new Chart(ctx, {
+    const myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
@@ -328,27 +324,36 @@
             }]
         },
         options: {
-            cutout: '60%',
+            cutout: '65%',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: { enabled: false }
-            },
-            // JONLI SURISH VA TEGINISH EFFEKTI (HAR QANDAY QURILMADA ISHLAYDI)
-            events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
-            onHover: (event, elements, chart) => {
-                if (elements && elements.length > 0) {
-                    const index = elements.index;
-                    const fruitName = chart.data.labels[index];
-                    const fruitCount = chart.data.datasets.data[index];
-                    
-                    document.getElementById('infoFruitName').innerText = fruitName;
-                    document.getElementById('infoFruitCount').innerText = fruitCount + " ta mavjud";
-                }
+                tooltip: { enabled: false } // Standart kichik qora tooltip o'chiq
             }
         }
     });
+
+    // 100% KAFOLATLANGAN YANGI METOD (BOSILGANDA HAM, TEGIB SURILGANDA HAM ISHLAYDI):
+    function updateChartInfo(evt) {
+        const points = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+        if (points.length > 0) {
+            const index = points.index;
+            const fruitName = myChart.data.labels[index];
+            const fruitCount = myChart.data.datasets.data[index];
+            
+            document.getElementById('infoFruitName').innerText = fruitName;
+            document.getElementById('infoFruitCount').innerText = fruitCount + " ta mavjud";
+        }
+    }
+
+    // Canvas elementiga barcha turdagi hodisalarni bog'laymiz
+    const canvasEl = document.getElementById('miniChart');
+    canvasEl.onclick = updateChartInfo;
+    canvasEl.onmousemove = updateChartInfo;
+    canvasEl.ontouchstart = updateChartInfo;
+    canvasEl.ontouchmove = updateChartInfo;
+
 </script>
 
 </body>
