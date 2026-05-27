@@ -3,62 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ombor Pro</title>
+    <title>Ombor Pro - Excel Uslubida</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background: #f4f7f6; font-size: 15px; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
+        body { background-color: #f8f9fa; font-family: sans-serif; font-size: 14px; }
+        .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: none; }
+        
+        /* Excel uslubidagi jadval */
         .table-responsive { overflow-x: auto; }
-        .btn-action { padding: 8px 12px; font-size: 18px; }
-        .form-control-sm { height: 40px; font-size: 16px; }
+        .table { border-collapse: collapse; width: 100%; }
+        .table th, .table td { border: 1px solid #dee2e6; vertical-align: middle; }
+        
+        /* Inputlar ramkasiz */
+        .table input {
+            border: none !important;
+            background: transparent !important;
+            width: 100%;
+            text-align: center;
+            padding: 8px 0;
+            outline: none;
+        }
+        .table input:focus { background-color: #fffde7 !important; }
+        
+        /* Tugmalar */
+        .btn-action { 
+            border: none; 
+            background: none; 
+            padding: 5px 10px; 
+            font-size: 18px; 
+            cursor: pointer; 
+        }
         
         @media (max-width: 576px) {
-            .container { padding-left: 10px; padding-right: 10px; }
-            h5 { font-size: 1.1rem; }
+            .container-fluid { padding: 5px; }
+            .btn-action { padding: 10px; }
         }
     </style>
 </head>
 <body class="bg-light">
 
-<div class="container py-3">
+<div class="container-fluid py-3">
     <div class="card p-3 mb-3 text-center">
-        <canvas id="myChart" style="max-height: 150px;"></canvas>
+        <canvas id="myChart" style="max-height: 120px;"></canvas>
         <div id="totalDisplay" class="h5 fw-bold text-success mt-2">Jami: 0 so'm</div>
     </div>
 
     <div class="card p-3 mb-3">
         <button class="btn btn-primary w-100" onclick="document.getElementById('addForm').classList.toggle('d-none')">
-            + Mahsulot qo'shish
+            + Yangi mahsulot qo'shish
         </button>
         <form id="addForm" action="/meva/qoshish" method="POST" class="d-none mt-3">
-            <input type="text" name="nomi" class="form-control mb-2" placeholder="Mahsulot nomi" required>
-            <input type="number" name="soni" inputmode="decimal" class="form-control mb-2" placeholder="Soni" required>
-            <input type="number" name="narxi" inputmode="decimal" class="form-control mb-2" placeholder="Narxi" required>
-            <button type="submit" class="btn btn-success w-100">Saqlash</button>
+            <div class="row g-2">
+                <div class="col-4"><input type="text" name="nomi" class="form-control" placeholder="Nomi" required></div>
+                <div class="col-3"><input type="number" name="soni" class="form-control" placeholder="Soni" required></div>
+                <div class="col-3"><input type="number" name="narxi" class="form-control" placeholder="Narxi" required></div>
+                <div class="col-2"><button type="submit" class="btn btn-success w-100">OK</button></div>
+            </div>
         </form>
     </div>
 
     <div class="card p-2">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-sm text-center">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Act</th></tr>
+                    <tr>
+                        <th style="width: 30px;">#</th>
+                        <th>Nomi</th>
+                        <th>Soni</th>
+                        <th>Narxi</th>
+                        <th>Amallar</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <% mevalar.forEach((meva) => { %>
-                    <form id="form_<%= meva.id %>" action="/meva/tahrirlash/<%= meva.id %>" method="POST" 
-                          onsubmit="return confirm('O\'zgarishlarni saqlashni tasdiqlaysizmi?')"></form>
-                    
+                    <form id="form_<%= meva.id %>" action="/meva/tahrirlash/<%= meva.id %>" method="POST" onsubmit="return confirm('O\'zgarishlarni saqlashni tasdiqlaysizmi?')"></form>
                     <tr>
-                        <td><input type="checkbox" class="meva-check" data-price="<%= meva.narxi %>" data-count="<%= meva.soni %>" onchange="calculateTotal()"></td>
-                        <td><%= meva.nomi %></td>
-                        <td><input type="number" name="soni" inputmode="decimal" value="<%= meva.soni %>" form="form_<%= meva.id %>" class="form-control form-control-sm" style="width: 70px;"></td>
-                        <td><input type="number" name="narxi" inputmode="decimal" value="<%= meva.narxi %>" form="form_<%= meva.id %>" class="form-control form-control-sm" style="width: 80px;"></td>
                         <td>
-                            <button type="submit" form="form_<%= meva.id %>" class="btn btn-outline-primary btn-action">💾</button>
-                            <a href="/meva/ochirish/<%= meva.id %>" class="btn btn-outline-danger btn-action" 
-                               onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?')">🗑️</a>
+                            <input type="checkbox" class="meva-check" data-price="<%= meva.narxi %>" data-count="<%= meva.soni %>" onchange="calculateTotal()">
+                        </td>
+                        <td class="text-start ps-2"><%= meva.nomi %></td>
+                        <td>
+                            <input type="number" name="soni" value="<%= meva.soni %>" form="form_<%= meva.id %>">
+                        </td>
+                        <td>
+                            <input type="number" name="narxi" value="<%= meva.narxi %>" form="form_<%= meva.id %>">
+                        </td>
+                        <td>
+                            <button type="submit" form="form_<%= meva.id %>" class="btn-action">💾</button>
+                            <a href="/meva/ochirish/<%= meva.id %>" class="btn-action" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?')">🗑️</a>
                         </td>
                     </tr>
                     <% }) %>
@@ -69,7 +102,7 @@
 </div>
 
 <script>
-    // Chart.js sozlamalari
+    // Chart.js grafik
     const ctx = document.getElementById('myChart').getContext('2d');
     new Chart(ctx, { 
         type: 'doughnut', 
