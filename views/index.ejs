@@ -2,70 +2,61 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 20px; font-size: 18px; }
-        .container { max-width: 900px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; padding: 20px; color: #1e293b; }
+        .container { max-width: 1000px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        .chart-container { height: 150px; margin-bottom: 20px; }
+        /* Excel sifat jadval */
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; font-size: 14px; border: 1px solid #e2e8f0; }
+        td { padding: 8px; border: 1px solid #e2e8f0; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        /* Inputlarni Exceldek qilish */
+        .excel-input { width: 100%; border: none; padding: 5px; outline: none; background: transparent; font-size: 15px; }
+        .excel-input:focus { background: #f0fdf4; border: 1px solid #22c55e; }
         
-        .btn-main { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
-        .btn-action { background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px; }
-        
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 18px; }
-        #totalDisplay { font-size: 22px; font-weight: 800; color: #10b981; margin-top: 15px; text-align: right; }
+        .btn-action { border: none; background: none; cursor: pointer; font-size: 18px; padding: 5px; }
+        .add-btn { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card">
-        <div class="chart-container">
-            <canvas id="myChart"></canvas>
-        </div>
-        <div id="totalDisplay">Tanlangan jami: 0 so'm</div>
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+        <div style="width: 120px;"><canvas id="myChart"></canvas></div>
+        <div id="totalDisplay" style="font-weight:800; font-size:20px; color:#1e293b;">Jami: 0 so'm</div>
     </div>
 
     <div class="card">
-        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <input type="text" name="nomi" placeholder="Meva nomi" required>
-            <input type="number" name="soni" placeholder="Soni" required>
-            <input type="number" name="narxi" placeholder="Narxi" required>
-            <button type="submit" class="btn-main">+ Qo'shish</button>
+        <button class="add-btn" onclick="document.getElementById('addForm').style.display='flex'">+ Qator qo'shish</button>
+        <form id="addForm" action="/meva/qoshish" method="POST" style="display:none; gap:10px; margin-top:15px;">
+            <input type="text" name="nomi" placeholder="Meva" required class="excel-input" style="border:1px solid #ccc">
+            <input type="number" name="soni" placeholder="Soni" required class="excel-input" style="border:1px solid #ccc">
+            <input type="number" name="narxi" placeholder="Narxi" required class="excel-input" style="border:1px solid #ccc">
+            <button type="submit" class="add-btn">Saqlash</button>
         </form>
-    </div>
 
-    <div class="card">
         <table>
             <thead>
-                <tr><th>Tanlash</th><th>Meva</th><th>Soni</th><th>Narxi</th><th>Amallar</th></tr>
+                <tr><th style="width:50px">Tanlash</th><th>Nomi</th><th>Soni</th><th>Narxi</th><th style="width:100px">Amallar</th></tr>
             </thead>
             <tbody>
                 <% mevalar.forEach((meva) => { %>
-                    <tr>
+                <tr>
+                    <td><input type="checkbox" class="meva-check" data-price="<%= meva.narxi %>" data-count="<%= meva.soni %>" onchange="calculateTotal()"></td>
+                    <td><%= meva.nomi %></td>
+                    <form action="/meva/tahrirlash/<%= meva.id %>" method="POST">
+                        <td><input type="number" name="soni" value="<%= meva.soni %>" class="excel-input" required></td>
+                        <td><input type="number" name="narxi" value="<%= meva.narxi %>" class="excel-input" required></td>
                         <td>
-                            <input type="radio" name="selectMeva" class="radio-select" 
-                                   data-price="<%= meva.narxi %>" data-count="<%= meva.soni %>" 
-                                   onchange="calculateTotal()" style="transform: scale(1.5);">
+                            <button type="submit" class="btn-action">💾</button>
+                            <a href="/meva/ochirish/<%= meva.id %>" class="btn-action">🗑️</a>
                         </td>
-                        <td><%= meva.nomi %></td>
-                        <td>
-                            <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" style="display: flex; gap: 5px;">
-                                <input type="number" name="soni" value="<%= meva.soni %>" style="width: 80px;">
-                                <button type="submit" class="btn-action">📝</button>
-                            </form>
-                        </td>
-                        <td><%= meva.narxi %></td>
-                        <td>
-                            <a href="/meva/ochirish/<%= meva.id %>" class="btn-action" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
-                        </td>
-                    </tr>
+                    </form>
+                </tr>
                 <% }) %>
             </tbody>
         </table>
@@ -75,27 +66,16 @@
 <script>
     // Chart
     const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>],
-            datasets: [{
-                data: [<% mevalar.forEach(m => { %> <%= m.soni %>, <% }) %>],
-                backgroundColor: ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff']
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
+    new Chart(ctx, { type: 'doughnut', data: { labels: [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>], datasets: [{ data: [<% mevalar.forEach(m => { %> <%= m.soni %>, <% }) %>], backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'] }] }, options: { plugins: { legend: { display: false } } } });
 
     // Summa
     function calculateTotal() {
-        const selected = document.querySelector('.radio-select:checked');
-        if (selected) {
-            const total = parseFloat(selected.dataset.price) * parseFloat(selected.dataset.count);
-            document.getElementById('totalDisplay').innerText = "Tanlangan jami: " + total.toLocaleString() + " so'm";
-        }
+        let total = 0;
+        document.querySelectorAll('.meva-check:checked').forEach(chk => {
+            total += (Number(chk.dataset.price) * Number(chk.dataset.count));
+        });
+        document.getElementById('totalDisplay').innerText = "Jami: " + total.toLocaleString() + " so'm";
     }
 </script>
-
 </body>
 </html>
