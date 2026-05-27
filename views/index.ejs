@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mevalar Ombori</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 80%;
+            max-width: 800px;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        tr:last-of-type {
+            border-bottom: 2px solid #4CAF50;
+        }
+        .status-empty {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🍎 Mevalar Ombori Boshqaruvi</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Meva Nomi</th>
+                <th>Soni (Shtuk)</th>
+                <th>Narxi (So'm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (mevalar && mevalar.length > 0) { %>
+                <% mevalar.forEach(meva => { %>
+                    <tr>
+                        <td><%= meva.id %></td>
+                        <td><strong><%= meva.nomi %></strong></td>
+                        <td><%= meva.soni %> ta</td>
+                        <td><%= Number(meva.narxi).toLocaleString('uz-UZ') %> so'm</td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" style="text-align: center;" class="status-empty">Omborda hech qanday meva topilmadi.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+</body>
+</html>
