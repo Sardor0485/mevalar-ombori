@@ -3,67 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mevalar Ombori</title>
+    <title>Admin Panel - Mevalar Ombori</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 80%;
-            max-width: 800px;
-            border-collapse: collapse;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
-        tr {
-            border-bottom: 1px solid #dddddd;
-        }
-        tr:nth-of-type(even) {
-            background-color: #f3f3f3;
-        }
-        tr:last-of-type {
-            border-bottom: 2px solid #4CAF50;
-        }
-        .status-empty {
-            color: #e74c3c;
-            font-weight: bold;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h1 { margin: 0; color: #2c3e50; font-size: 24px; }
+        .logout-btn { padding: 8px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        
+        /* Form uslubi */
+        .crud-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .crud-card h3 { margin-top: 0; color: #27ae60; }
+        .form-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .form-group input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; flex: 1; min-width: 150px; }
+        .btn-add { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        /* Jadval uslubi */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; }
+        th { background: #34495e; color: white; text-transform: uppercase; font-size: 13px; }
+        tr { border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        
+        /* Inline Tahrirlash formasi */
+        .edit-form { display: flex; gap: 5px; margin: 0; }
+        .edit-form input { width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
+        .btn-update { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .btn-delete { background: #e74c3c; color: white; text-decoration: none; padding: 5px 10px; border-radius: 3px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>🍎 Mevalar Ombori Boshqaruvi</h1>
+<div class="container">
+    <div class="header">
+        <h1>⚙️ Mevalar Ombori — Admin Panel</h1>
+        <a href="/logout" class="logout-btn">Chiqish ➔</a>
+    </div>
+
+    <div class="crud-card">
+        <h3>➕ Yangi Meva Qo'shish</h3>
+        <form action="/meva/qoshish" method="POST" class="form-group">
+            <input type="text" name="nomi" placeholder="Meva nomi (Masalan: Anjir)" required>
+            <input type="number" name="soni" placeholder="Soni (Shtuk)" min="0" required>
+            <input type="number" name="narxi" placeholder="Narxi (So'm)" min="0" step="0.01" required>
+            <button type="submit" class="btn-add">Omborga qo'shish</button>
+        </form>
+    </div>
 
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Meva Nomi</th>
-                <th>Soni (Shtuk)</th>
-                <th>Narxi (So'm)</th>
+                <th>Soni va Narxini Tahrirlash</th>
+                <th>O'chirish</th>
             </tr>
         </thead>
         <tbody>
@@ -71,18 +64,27 @@
                 <% mevalar.forEach(meva => { %>
                     <tr>
                         <td><%= meva.id %></td>
-                        <td><strong><%= meva.nomi %></strong></td>
-                        <td><%= meva.soni %> ta</td>
-                        <td><%= Number(meva.narxi).toLocaleString('uz-UZ') %> so'm</td>
+                        <td><strong style="color: #2c3e50; font-size: 16px;"><%= meva.nomi %></strong></td>
+                        <td>
+                            <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
+                                <input type="number" name="soni" value="<%= meva.soni %>" title="Soni" required> ta | 
+                                <input type="number" name="narxi" value="<%= meva.narxi %>" title="Narxi" step="0.01" required> so'm
+                                <button type="submit" class="btn-update">Saqlash</button>
+                            </form>
+                        </td>
+                        <td>
+                            <a href="/meva/ochirish/<%= meva.id %>" class="btn-delete" onclick="return confirm('Haqiqatdan ham ushbu mevani o\'chirmoqchimisiz?')">❌ O'chirish</a>
+                        </td>
                     </tr>
                 <% }) %>
             <% } else { %>
                 <tr>
-                    <td colspan="4" style="text-align: center;" class="status-empty">Omborda hech qanday meva topilmadi.</td>
+                    <td colspan="4" style="text-align: center; color: #7f8c8d; padding: 20px;">Ombor bo'sh. Birorta meva qo'shing!</td>
                 </tr>
             <% } %>
         </tbody>
     </table>
+</div>
 
 </body>
 </html>
