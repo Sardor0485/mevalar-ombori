@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Mevalar Ombori</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1 fw-bold">🥭 Mevalar Ombori (Admin)</span>
+        <a href="/logout" class="btn btn-outline-danger btn-sm fw-bold">Chiqish</a>
+    </div>
+</nav>
+
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm p-4 border-0 rounded-3">
+                <h5 class="card-title text-success fw-bold mb-3">➕ Yangi Meva Qo'shish</h5>
+                <form action="/admin/add" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Meva nomi</label>
+                        <input type="text" name="nomi" class="form-control" placeholder="Masalan: Olma" required autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Soni (kg / dona)</label>
+                        <input type="number" name="soni" class="form-control" placeholder="0" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Narxi (so'm)</label>
+                        <input type="number" name="narxi" class="form-control" placeholder="0" min="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">Omborga qo'shish</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <div class="card shadow-sm p-4 border-0 rounded-3">
+                <h5 class="card-title text-primary fw-bold mb-3">📦 Ombordagi Mahsulotlar</h5>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Meva Nomi</th>
+                                <th scope="col">Soni</th>
+                                <th scope="col">Narxi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (mevalar.length === 0) { %>
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Omborda meva yo'q. Birinchisini qo'shing!</td>
+                                </tr>
+                            <% } else { %>
+                                <% mevalar.forEach(meva => { %>
+                                    <tr>
+                                        <td><strong>#<%= meva.id %></strong></td>
+                                        <td class="fw-bold text-secondary"><%= meva.nomi %></td>
+                                        <td><span class="badge bg-info text-dark fs-6"><%= meva.soni %> ta</span></td>
+                                        <td class="text-success fw-bold"><%= meva.narxi.toLocaleString() %> so'm</td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
