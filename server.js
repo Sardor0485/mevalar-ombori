@@ -6,30 +6,41 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Formadan keladigan POST ma'lumotlarni o'qish uchun sozlamalar
+// Formadan keladigan (POST) ma'lumotlarni o'qish sozlamalari
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessiya sozlamalari
+// Sessiya sozlamalari (Login holatini saqlash uchun)
 app.use(session({
     secret: 'meva_maxfiy_kalit_9876',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 30 } // 30 daqiqa faol
+    cookie: { maxAge: 1000 * 60 * 30 } // 30 daqiqa davomida faol
 }));
 
-// EJS shablonizatorini sozlash
+// EJS shablonizatorini aynan sizning 'views' papkangizga moslash
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// PostgreSQL (Render) ulanishi
+// PostgreSQL (Render) ma'lumotlar bazasi ulanishi
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-// Himoya funksiyasi (Faqat admin kira olishi uchun)
+// Bazaga ulanish testi
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('❌ BAZAGA ULANISHDA XATO:', err.message);
+    } else {
+        console.log('✅ Ma\'lumotlar bazasiga muvaffaqiyatli ulandi!');
+        release();
+    }
+});
+
+// Avtorizatsiya himoyasi (Middleware)
 function checkAuth(req, res, next) {
     if (req.session && req.session.isLoggedIn) {
         return next();
@@ -37,9 +48,9 @@ function checkAuth(req, res, next) {
     res.redirect('/login');
 }
 
-// ================= ROUTES (CRUD & ADMIN) =================
+// ================= AMALLAR (ROUTES) =================
 
-// READ (O'qish) - Bosh sahifada mevalarni ko'rsatish
+// READ - Bosh sahifa (Mevalarni ko'rsatish)
 app.get('/', checkAuth, async (req, res) => {
     try {
         const result = await pool.query('SELECT id, nomi, soni, narxi FROM mevalar ORDER BY id ASC;');
@@ -50,7 +61,7 @@ app.get('/', checkAuth, async (req, res) => {
     }
 });
 
-// CREATE (Yaratish) - Yangi meva qo'shish
+// CREATE - Yangi meva qo'shish
 app.post('/meva/qoshish', checkAuth, async (req, res) => {
     const { nomi, soni, narxi } = req.body;
     try {
@@ -60,12 +71,12 @@ app.post('/meva/qoshish', checkAuth, async (req, res) => {
         );
         res.redirect('/');
     } catch (err) {
-        console.error("❌ Qo'shishda xato:", err.message);
+        console.error("❌ Meva qo'shishda xato:", err.message);
         res.status(500).send(`Meva qo'shishda xatolik: ${err.message}`);
     }
 });
 
-// UPDATE (Yangilash) - Meva miqdori yoki narxini o'zgartirish
+// UPDATE - Meva narxi va sonini tahrirlash
 app.post('/meva/tahrirlash/:id', checkAuth, async (req, res) => {
     const { id } = req.params;
     const { soni, narxi } = req.body;
@@ -77,11 +88,11 @@ app.post('/meva/tahrirlash/:id', checkAuth, async (req, res) => {
         res.redirect('/');
     } catch (err) {
         console.error("❌ Tahrirlashda xato:", err.message);
-        res.status(500).send(`Meva tahrirlashda xatolik: ${err.message}`);
+        res.status(500).send(`Tahrirlashda xatolik: ${err.message}`);
     }
 });
 
-// DELETE (O'chirish) - Mevani bazadan yo'qotish
+// DELETE - Mevani o'chirish
 app.get('/meva/ochirish/:id', checkAuth, async (req, res) => {
     const { id } = req.params;
     try {
@@ -89,11 +100,11 @@ app.get('/meva/ochirish/:id', checkAuth, async (req, res) => {
         res.redirect('/');
     } catch (err) {
         console.error("❌ O'chirishda xato:", err.message);
-        res.status(500).send(`Meva o'chirishda xatolik: ${err.message}`);
+        res.status(500).send(`O'chirishda xatolik: ${err.message}`);
     }
 });
 
-// LOGIN / LOGOUT YO'NALISHLARI
+// LOGIN / LOGOUT
 app.get('/login', (req, res) => {
     if (req.session.isLoggedIn) return res.redirect('/');
     res.render('login', { error: null });
@@ -110,9 +121,11 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/login'));
+    req.session.destroy(() => {
+        res.redirect('/login');
+    });
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Admin panelli server ${PORT}-portda ishlamoqda...`);
+    console.log(`🚀 Server ${PORT}-portda muvaffaqiyatli ishlamoqda...`);
 });
