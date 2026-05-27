@@ -1,0 +1,21 @@
+{
+  "name": "oquv_papkasi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "\"# mevalar-ombori\"",
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "nano": "^11.0.5",
+    "pg": "^8.21.0",
+    "vim": "^0.1.0"
+  }
+}
