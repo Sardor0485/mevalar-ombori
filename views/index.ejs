@@ -6,127 +6,71 @@
     <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; color: #0f172a; margin: 0; padding: 8px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 900px; }
-
-        /* NAV BAR */
-        .top-nav { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; gap: 8px; }
-        .btn-main { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 15px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-        .btn-main:hover { background: #059669; }
-
-        /* ANALITIKA BLOKI */
-        .analytics-card { background: #ffffff; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        
-        .chart-row { display: flex; align-items: center; justify-content: space-around; gap: 15px; flex-wrap: wrap; }
-        .chart-container-box { width: 140px; height: 140px; position: relative; flex-shrink: 0; }
-
-        /* INTERAKTIV OYNA */
-        .chart-info-display { background: #f8fafc; border: 2px solid #10b981; border-radius: 10px; padding: 12px 16px; min-width: 200px; text-align: left; }
-        .info-title { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
-        .info-value { font-size: 16px; font-weight: 700; color: #10b981; }
-
-        /* JADVAL */
-        .table-wrapper { width: 100%; overflow-x: auto; background: #fff; border-radius: 12px; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        table { width: 100%; border-collapse: collapse; font-size: 17px; min-width: 600px; }
-        th { background: #f8fafc; padding: 12px 14px; text-align: left; color: #475569; font-weight: 800; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
-        
-        .borderless-input { border: 1px solid transparent; background: transparent; padding: 4px 6px; font-size: 17px; width: 85px; font-weight: 700; outline: none; }
-        .check-custom { width: 22px; height: 22px; accent-color: #10b981; cursor: pointer; }
-        .actions-group { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn-emoji-edit { background: #e6f4ea; border: none; font-size: 20px; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
-        .btn-emoji-del { background: #fce8e6; border: none; font-size: 20px; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
-
-        #addForm { display: none; padding: 14px; background: #fff; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 8px; width: 100%; }
+        body { font-family: sans-serif; background: #f1f5f9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; }
+        .chart-container { height: 300px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        #totalDisplay { font-size: 24px; font-weight: bold; color: #10b981; margin-top: 20px; text-align: right; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-nav">
-        <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
-        <a href="/logout" style="color: #ef4444; font-weight: 800; padding: 8px 14px; border: 1px solid #fca5a5; border-radius: 8px;">Chiqish</a>
+    <div class="chart-container">
+        <canvas id="myChart"></canvas>
     </div>
+    
+    <div id="totalDisplay">Jami: 0 so'm</div>
 
-    <div class="analytics-card">
-        <div class="chart-row">
-            <div class="chart-container-box">
-                <canvas id="miniChart"></canvas>
-            </div>
-            <div class="chart-info-display">
-                <div class="info-title" id="infoFruitName">Meva tanlang</div>
-                <div class="info-value" id="infoFruitCount">Grafik bo'lagini bosing...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="addForm">
-        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" name="nomi" placeholder="Nomi" style="flex:1; padding:10px; border-radius:6px; border:1px solid #cbd5e1;" required>
-            <input type="number" name="soni" placeholder="Soni" style="width:70px; padding:10px;" required>
-            <input type="number" name="narxi" placeholder="Narxi" style="width:120px; padding:10px;" required>
-            <button type="submit" class="btn-main">Saqlash</button>
-        </form>
-    </div>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr><th></th><th>Meva nomi</th><th>Soni</th><th>Narxi</th><th>Amallar</th></tr>
-            </thead>
-            <tbody>
-                <% mevalar.forEach((meva) => { %>
-                    <tr>
-                        <td><input type="checkbox" class="check-custom"></td>
-                        <td style="font-weight: 800;"><%= meva.nomi %></td>
-                        <form action="/meva/tahrirlash/<%= meva.id %>" method="POST">
-                            <td><input type="number" name="soni" class="borderless-input" value="<%= meva.soni %>"></td>
-                            <td><input type="number" name="narxi" class="borderless-input" value="<%= meva.narxi %>"></td>
-                            <td>
-                                <div class="actions-group">
-                                    <button type="submit" class="btn-emoji-edit">📝</button>
-                                    <a href="/meva/ochirish/<%= meva.id %>" class="btn-emoji-del" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
-                                </div>
-                            </td>
-                        </form>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+    <table>
+        <thead>
+            <tr><th>Meva</th><th>Soni</th><th>Narxi</th><th>Jami</th></tr>
+        </thead>
+        <tbody>
+            <% mevalar.forEach((meva) => { %>
+                <tr class="meva-row">
+                    <td><%= meva.nomi %></td>
+                    <td class="soni"><%= meva.soni %></td>
+                    <td class="narxi"><%= meva.narxi %></td>
+                    <td><%= (meva.soni * meva.narxi).toLocaleString() %> so'm</td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
 </div>
 
 <script>
-    function toggleForm() { const f = document.getElementById('addForm'); f.style.display = (f.style.display === 'block') ? 'none' : 'block'; }
-    
+    // 1. Chart uchun ma'lumotlarni xatosiz olish
     const labels = [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>];
     const data = [<% mevalar.forEach(m => { %> <%= m.soni %>, <% }) %>];
-    const colors = ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff', '#5f27cd'];
 
-    const ctx = document.getElementById('miniChart').getContext('2d');
-    const myChart = new Chart(ctx, {
+    // 2. Chartni ishga tushirish
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
-            datasets: [{ data: data, backgroundColor: colors, borderWidth: 2 }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            onClick: (e, elements) => {
-                if (elements.length > 0) {
-                    const idx = elements.index;
-                    document.getElementById('infoFruitName').innerText = myChart.data.labels[idx];
-                    document.getElementById('infoFruitCount').innerText = myChart.data.datasets.data[idx] + " ta zaxirada";
-                    myChart.setActiveElements([{ datasetIndex: 0, index: idx }]);
-                    myChart.update();
-                }
-            }
+            datasets: [{
+                data: data,
+                backgroundColor: ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff']
+            }]
         }
     });
+
+    // 3. TOTAL SUMMANI HISOBLASH (undefined bo'lmasligi uchun)
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.meva-row').forEach(row => {
+            let soni = parseFloat(row.querySelector('.soni').innerText) || 0;
+            let narxi = parseFloat(row.querySelector('.narxi').innerText) || 0;
+            total += (soni * narxi);
+        });
+        document.getElementById('totalDisplay').innerText = "Jami: " + total.toLocaleString() + " so'm";
+    }
+
+    calculateTotal();
 </script>
+
 </body>
 </html>
