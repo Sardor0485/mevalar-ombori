@@ -8,6 +8,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
 
+        /* DIZAYN QIYSHAYMASLIGI UCHUN GLOBAL SOZLAMALAR */
+        *, *::before, *::after {
+            box-sizing: border-box; /* Elementlar chetga chiqib ketishini to'liq to'sadi */
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f1f5f9;
@@ -19,9 +24,12 @@
             align-items: center;
         }
 
-        .container { width: 100%; max-width: 900px; }
+        .container { 
+            width: 100%; 
+            max-width: 900px; 
+        }
 
-        /* NAV BAR */
+        /* TEPADAGI NAV BAR */
         .top-nav {
             display: flex;
             justify-content: flex-end;
@@ -37,7 +45,7 @@
         }
         .btn-main:hover { background: #059669; }
 
-        /* ANALITIKA BLOKI */
+        /* ANALITIKA BLOKI (GEOMETRIK IDEAL VA TEKIS) */
         .analytics-card {
             background: #ffffff;
             border-radius: 12px;
@@ -47,7 +55,7 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* TEPADAGI DINAMIK MEVALAR RO'YXATI */
+        /* MEVALAR RO'YXATI (LEGEND) */
         .custom-legend {
             display: flex;
             flex-wrap: wrap;
@@ -69,44 +77,48 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        /* CHART SATRI */
+        /* FLEXBOX ROW - ELEMENTLARNI DOIMO BIR CHIZIQDA SAQLAYDI */
         .chart-row {
             display: flex;
             align-items: center;
             justify-content: space-around;
             gap: 15px;
-            position: relative;
+            flex-wrap: wrap; /* Kichik ekranlarda tartib bilan pastga tushadi, qiyshaymaydi */
         }
+        
         .chart-container-box {
             width: 120px;
             height: 120px;
             position: relative;
+            flex-shrink: 0;
         }
 
-        /* CHART TASHQARISIDAGI JONLI AXBOROT OYNASI */
+        /* JONLI AXBOROT OYNASI */
         .chart-info-display {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 10px 14px;
-            min-width: 160px;
+            min-width: 170px;
             text-align: left;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
         .info-value { font-size: 14px; font-weight: 700; color: #10b981; }
 
-        /* TOTAL SUMMA */
+        /* TOTAL REKORD */
         .total-box {
             text-align: right;
+            min-width: 120px;
         }
         .total-label { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
         .total-value { font-size: 20px; font-weight: 800; color: #10b981; }
 
-        /* QIDIRUV PANELLI */
-        .search-row { margin-bottom: 8px; position: relative; }
+        /* QIDIRUV */
+        .search-row { margin-bottom: 8px; position: relative; width: 100%; }
         .search-input {
             width: 100%; padding: 12px 15px 12px 42px; border-radius: 8px;
             border: 1px solid #cbd5e1; background: #ffffff; font-size: 15px; outline: none;
@@ -115,10 +127,10 @@
         .search-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
         .search-icon { position: absolute; left: 14px; top: 12px; color: #94a3b8; font-size: 16px; }
 
-        /* JADVAL WA MOBIL SCROLL */
+        /* JADVALNI REZINA KABI REAKSION QILUVCHI KONTEYNER */
         .table-wrapper {
             width: 100%;
-            overflow-x: auto;
+            overflow-x: auto; /* Mobil ekranda jadval siqilib qiyshaymaydi, o'ngga suriladi */
             -webkit-overflow-scrolling: touch;
             background: #fff; 
             border-radius: 12px; 
@@ -129,15 +141,15 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 17px; /* Yirik va qulay shrift */
-            min-width: 600px;
+            font-size: 17px; 
+            min-width: 600px; /* Jadval o'zining baquvvat shaklini saqlab qoladi */
         }
         
         th { background: #f8fafc; padding: 12px 14px; text-align: left; color: #475569; font-weight: 800; font-size: 16px; border-bottom: 2px solid #e2e8f0; }
         td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         
-        /* RAMKASIZ INPUTLAR */
+        /* INPUTLAR */
         .borderless-input {
             border: 1px solid transparent; background: transparent;
             padding: 4px 6px; font-size: 17px; width: 85px; outline: none;
@@ -147,7 +159,7 @@
 
         .check-custom { width: 22px; height: 22px; accent-color: #10b981; cursor: pointer; }
 
-        /* YORQIN SMAYLIK AMAL TUGMALARI */
+        /* SMAYLIK TUGMALARI */
         .actions-group { display: flex; gap: 8px; justify-content: flex-end; }
         
         .btn-emoji-edit {
@@ -162,7 +174,7 @@
         }
         .btn-emoji-del:hover { background: #ef4444; transform: scale(1.1); }
 
-        #addForm { display: none; padding: 14px; background: #fff; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 8px; }
+        #addForm { display: none; padding: 14px; background: #fff; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 8px; width: 100%; }
     </style>
 </head>
 <body>
@@ -183,8 +195,8 @@
             </div>
             
             <div class="chart-info-display">
-                <div class="info-title" id="infoFruitName">Meva tanlang</div>
-                <div class="info-value" id="infoFruitCount">Ustiga bosing...</div>
+                <div class="info-title" id="infoFruitName">Meva nomi</div>
+                <div class="info-value" id="infoFruitCount">0 ta</div>
             </div>
 
             <div class="total-box">
@@ -195,8 +207,8 @@
     </div>
 
     <div id="addForm">
-        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 8px;">
-            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
+        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; min-width: 150px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
             <input type="number" name="soni" placeholder="Soni" style="width: 70px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
             <input type="number" name="narxi" placeholder="Narxi" style="width: 120px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
             <button type="submit" class="btn-main">Saqlash</button>
@@ -296,6 +308,12 @@
         `;
     });
 
+    // Birinchi mevani yuklanganda srazi ko'rsatish
+    if(labels.length > 0) {
+        document.getElementById('infoFruitName').innerText = labels;
+        document.getElementById('infoFruitCount').innerText = data + " ta mavjud";
+    }
+
     const ctx = document.getElementById('miniChart').getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',
@@ -317,8 +335,9 @@
                 legend: { display: false },
                 tooltip: { enabled: false }
             },
-            // JONLI VA CHETGA CHIQADIGAN TO'G'RILANGAN INTERAKTIV SCRIPT
-            onClick: (event, elements, chart) => {
+            // JONLI SURISH VA TEGINISH EFFEKTI (HAR QANDAY QURILMADA ISHLAYDI)
+            events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
+            onHover: (event, elements, chart) => {
                 if (elements && elements.length > 0) {
                     const index = elements.index;
                     const fruitName = chart.data.labels[index];
