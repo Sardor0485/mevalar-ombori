@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 10000;
 const TOKEN = '7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0';
 const bot = new TelegramBot(TOKEN);
 
-// Webhook sozlamasi
 bot.setWebHook(`https://mevalar-ombori.onrender.com/bot${TOKEN}`);
 
 app.use(express.urlencoded({ extended: true }));
@@ -20,13 +19,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-// Auth
 function checkAuth(req, res, next) {
     if (req.signedCookies && req.signedCookies.isLoggedIn === 'true') return next();
     res.redirect('/login');
 }
 
-// Routes
 app.get('/', checkAuth, async (req, res) => {
     const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC;');
     res.render('index', { mevalar: result.rows });
@@ -48,8 +45,7 @@ app.get('/meva/ochirish/:id', checkAuth, async (req, res) => {
     res.redirect('/');
 });
 
-// Login
-app.get('/login', (req, res) => res.send(`<h2>Tizimga kirish</h2><form method="POST"><input name="username" placeholder="Login"><input type="password" name="password" placeholder="Parol"><button>Kirish</button></form>`));
+app.get('/login', (req, res) => res.send(`<h2>Kirish</h2><form method="POST"><input name="username" placeholder="Login"><input type="password" name="password" placeholder="Parol"><button>Kirish</button></form>`));
 app.post('/login', (req, res) => {
     if (req.body.username === 'admin' && req.body.password === '12345') {
         res.cookie('isLoggedIn', 'true', { signed: true, maxAge: 86400000, httpOnly: true });
@@ -57,11 +53,7 @@ app.post('/login', (req, res) => {
     } else res.send("Parol xato! <a href='/login'>Qaytish</a>");
 });
 
-// Telegram Webhook
-app.post(`/bot${TOKEN}`, (req, res) => {
-    bot.processUpdate(req.body);
-    res.sendStatus(200);
-});
+app.post(`/bot${TOKEN}`, (req, res) => { bot.processUpdate(req.body); res.sendStatus(200); });
 
 bot.onText(/\/status/, async (msg) => {
     const res = await pool.query('SELECT nomi, soni FROM mevalar');
@@ -69,4 +61,4 @@ bot.onText(/\/status/, async (msg) => {
     bot.sendMessage(msg.chat.id, text, { parse_mode: 'Markdown' });
 });
 
-app.listen(PORT, () => console.log(`🚀 Server ${PORT}-portda ishlamoqda`));
+app.listen(PORT, () => console.log(`🚀 Server ${PORT}-portda!`));
