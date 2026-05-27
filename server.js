@@ -3,26 +3,27 @@ const { Pool } = require('pg');
 const TelegramBot = require('node-telegram-bot-api');
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// Ma'lumotlar bazasi
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-const bot = new TelegramBot('7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0');
+// Bot
+const TOKEN = '7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0';
+const bot = new TelegramBot(TOKEN, { polling: true }); // Polling yaxshiroq ishlaydi Render'da
 
 app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Webhook xatoligini oldini olish
-try {
-    bot.setWebHook(`https://mevalar-ombori.onrender.com/bot7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0`);
-} catch (e) { console.log("Webhook o'rnatilmadi:", e); }
-
+// Sahifalar
 app.get('/', async (req, res) => {
     const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC');
     res.render('index', { mevalar: result.rows });
 });
 
 app.post('/meva/qoshish', async (req, res) => {
-    await pool.query('INSERT INTO mevalar (nomi, soni, narxi) VALUES ($1, $2, $3)', [req.body.nomi, req.body.soni, req.body.narxi]);
+    const { nomi, soni, narxi } = req.body;
+    await pool.query('INSERT INTO mevalar (nomi, soni, narxi) VALUES ($1, $2, $3)', [nomi, soni, narxi]);
     res.redirect('/');
 });
 
@@ -36,4 +37,17 @@ app.get('/meva/ochirish/:id', async (req, res) => {
     res.redirect('/');
 });
 
-app.listen(PORT);
+// Bot buyruqlari
+bot.on('message', async (msg) => {
+    if (msg.text.startsWith('/')) return;
+    const p = msg.text.split(' ');
+    if (p.length === 3 && !isNaN(p[1]) && !isNaN(p[2])) {
+        await pool.query('INSERT INTO mevalar (nomi, soni, narxi) VALUES ($1, $2, $3)', [p[0], parseInt(p[1]), parseInt(p[2])]);
+        bot.sendMessage(msg.chat.id, "✅ Saqlandi!");
+    } else {
+        const res = await pool.query('SELECT * FROM mevalar WHERE nomi ILIKE $1', [`%${msg.text}%`]);
+        bot.sendMessage(msg.chat.id, res.rows.length ? res.rows.map(m => `${m.nomi}: ${m.soni} ta`).join('\n') : "Topilmadi.");
+    }
+});
+
+app.listen(PORT, () => console.log(`Server ${PORT}-portda ishlamoqda.`));
