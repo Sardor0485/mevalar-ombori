@@ -6,22 +6,23 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .chart-box { width: 150px; height: 150px; margin: auto; }
-        .excel-input { width: 60px; text-align: center; border: 1px solid #ccc; }
+        .excel-input { width: 60px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        .action-btns { display: flex; gap: 5px; justify-content: center; }
     </style>
 </head>
-<body class="bg-light p-2">
-    <div class="card p-2 mb-3 shadow-sm"><div class="chart-box"><canvas id="myChart"></canvas></div></div>
+<body class="bg-light p-3">
+    <div class="card p-3 mb-4 shadow-sm border-0"><div class="chart-box"><canvas id="myChart"></canvas></div></div>
 
-    <div class="table-responsive bg-white shadow-sm p-2 rounded">
-        <table class="table table-sm align-middle">
-            <thead><tr><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Amal</th></tr></thead>
+    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+        <table class="table align-middle text-center">
+            <thead class="table-dark"><tr><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Amallar</th></tr></thead>
             <tbody>
                 <% mevalar.forEach((m) => { %>
                 <tr>
-                    <td><%= m.nomi %></td>
+                    <td class="fw-bold"><%= m.nomi %></td>
                     <td><input type="number" value="<%= m.soni %>" id="soni-<%= m.id %>" class="excel-input"></td>
                     <td><input type="number" value="<%= m.narxi %>" id="narxi-<%= m.id %>" class="excel-input"></td>
-                    <td>
+                    <td class="action-btns">
                         <button onclick="save('<%= m.id %>')" class="btn btn-sm btn-primary">Edit</button>
                         <a href="/meva/ochirish/<%= m.id %>" class="btn btn-sm btn-danger">Del</a>
                     </td>
@@ -32,12 +33,12 @@
     </div>
 
 <script>
-    const labels = <%- JSON.stringify(mevalar.map(m => m.nomi)) %>;
-    const data = <%- JSON.stringify(mevalar.map(m => m.soni)) %>;
-    
     new Chart(document.getElementById('myChart'), { 
         type: 'doughnut', 
-        data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }] },
+        data: { 
+            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>, 
+            datasets: [{ data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'] }] 
+        },
         options: { maintainAspectRatio: false }
     });
 

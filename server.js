@@ -15,20 +15,20 @@ app.use(cookieParser('secret'));
 app.set('view engine', 'ejs');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-// Telegram Bot
+// Telegram Buyruqlar
 app.post(`/bot${TOKEN}`, (req, res) => { bot.processUpdate(req.body); res.sendStatus(200); });
 
 bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(msg.chat.id, "Ombor nazoratchisi:", {
-        reply_markup: { inline_keyboard: [[{ text: "📦 Status", callback_data: 'status' }]] }
+    bot.sendMessage(msg.chat.id, "📦 Ombor nazorati", {
+        reply_markup: { inline_keyboard: [[{ text: "📊 Statusni ko'rish", callback_data: 'status' }]] }
     });
 });
 
 bot.on('callback_query', async (q) => {
     if (q.data === 'status') {
         const res = await pool.query('SELECT nomi, soni FROM mevalar');
-        let text = "📦 *Ombor:\n" + res.rows.map(m => `• ${m.nomi}: ${m.soni} ta`).join('\n');
-        bot.sendMessage(q.message.chat.id, text, { parse_mode: 'Markdown' });
+        let text = "<b>📦 Ombor holati:</b>\n" + res.rows.map(m => `• ${m.nomi}: ${m.soni} ta`).join('\n');
+        bot.sendMessage(q.message.chat.id, text, { parse_mode: 'HTML' });
     }
 });
 
@@ -48,4 +48,4 @@ app.get('/meva/ochirish/:id', async (req, res) => {
     res.redirect('/');
 });
 
-app.listen(PORT, () => console.log('Server ishda!'));
+app.listen(PORT);
