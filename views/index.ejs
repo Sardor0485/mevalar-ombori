@@ -37,7 +37,7 @@
         }
         .btn-main:hover { background: #059669; }
 
-        /* ANALITIKA BLOKI (RASMDAGIDEK KENG) */
+        /* ANALITIKA BLOKI */
         .analytics-card {
             background: #ffffff;
             border-radius: 12px;
@@ -47,7 +47,7 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* CUSTOM LEGEND (TEPADAGI RO'YXAT) */
+        /* TEPADAGI DINAMIK MEVALAR RO'YXATI */
         .custom-legend {
             display: flex;
             flex-wrap: wrap;
@@ -71,7 +71,7 @@
             border-radius: 50%;
         }
 
-        /* CHART VISUAL ROW */
+        /* CHART SATRI */
         .chart-row {
             display: flex;
             align-items: center;
@@ -85,7 +85,7 @@
             position: relative;
         }
 
-        /* CHART TASHQARISIDAGI JONLI YAZUV OYNASI */
+        /* CHART TASHQARISIDAGI JONLI AXBOROT OYNASI */
         .chart-info-display {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -98,14 +98,14 @@
         .info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
         .info-value { font-size: 14px; font-weight: 700; color: #10b981; }
 
-        /* TOTAL REKORD BLOCK */
+        /* TOTAL SUMMA */
         .total-box {
             text-align: right;
         }
         .total-label { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
         .total-value { font-size: 20px; font-weight: 800; color: #10b981; }
 
-        /* POISK (QIDIRUV) */
+        /* QIDIRUV PANELLI */
         .search-row { margin-bottom: 8px; position: relative; }
         .search-input {
             width: 100%; padding: 12px 15px 12px 42px; border-radius: 8px;
@@ -115,7 +115,7 @@
         .search-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
         .search-icon { position: absolute; left: 14px; top: 12px; color: #94a3b8; font-size: 16px; }
 
-        /* MAKSIMAL ZICH VA YIRIK JADVAL */
+        /* JADVAL WA MOBIL SCROLL */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -129,7 +129,7 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 17px; /* Shriftlar ancha yiriklashtirildi */
+            font-size: 17px; /* Yirik va qulay shrift */
             min-width: 600px;
         }
         
@@ -137,7 +137,7 @@
         td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         
-        /* INPUTLAR (ZICH VA QALIN MATNLI) */
+        /* RAMKASIZ INPUTLAR */
         .borderless-input {
             border: 1px solid transparent; background: transparent;
             padding: 4px 6px; font-size: 17px; width: 85px; outline: none;
@@ -276,7 +276,6 @@
         document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
     }
 
-    // RANGLAR VA JONLI TASHQI TOOLTIP SOZLAMALARI
     const labels = [];
     const data = [];
     <% mevalar.forEach(m => { %>
@@ -286,7 +285,6 @@
 
     const brightColors = ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff', '#5f27cd'];
 
-    // Dinamik tepadagi ro'yxatni (Legend) generatsiya qilish
     const legendContainer = document.getElementById('chartLegend');
     labels.forEach((label, index) => {
         const color = brightColors[index % brightColors.length];
@@ -317,16 +315,17 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    enabled: false // Ichki eski tool-tip o'chirildi
-                }
+                tooltip: { enabled: false }
             },
-            // Bo'lak bosilganda tashqaridagi blokni yangilash
-            onClick: (event, elements) => {
-                if (elements.length > 0) {
+            // JONLI VA CHETGA CHIQADIGAN TO'G'RILANGAN INTERAKTIV SCRIPT
+            onClick: (event, elements, chart) => {
+                if (elements && elements.length > 0) {
                     const index = elements.index;
-                    document.getElementById('infoFruitName').innerText = labels[index];
-                    document.getElementById('infoFruitCount').innerText = data[index] + " ta mavjud";
+                    const fruitName = chart.data.labels[index];
+                    const fruitCount = chart.data.datasets.data[index];
+                    
+                    document.getElementById('infoFruitName').innerText = fruitName;
+                    document.getElementById('infoFruitCount').innerText = fruitCount + " ta mavjud";
                 }
             }
         }
