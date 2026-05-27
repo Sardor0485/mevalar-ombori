@@ -11,6 +11,7 @@
     <style>
         body { font-family: sans-serif; background: #f8fafc; }
         .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
+        #addForm { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -20,10 +21,20 @@
         <canvas id="mevaChart"></canvas>
     </div>
 
-    <div class="flex gap-2 mb-4">
+    <div class="flex gap-2 mb-4 items-center">
+        <button onclick="toggleForm()" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 shadow-lg">
+            <i class="fa-solid fa-plus"></i>
+        </button>
         <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg flex-1">
         <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="fa-solid fa-file-excel"></i></button>
     </div>
+
+    <form id="addForm" action="/meva/qoshish" method="POST" class="hidden card p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-2 shadow-md">
+        <input type="text" name="nomi" placeholder="Nomi" class="border p-2 rounded" required>
+        <input type="number" name="narxi" placeholder="Narxi" class="border p-2 rounded" required>
+        <input type="number" name="soni" placeholder="Soni" class="border p-2 rounded" required>
+        <button class="bg-indigo-600 text-white p-2 rounded">Saqlash</button>
+    </form>
 
     <div class="card shadow-sm overflow-x-auto">
         <table class="w-full text-left" id="mevaTable">
@@ -50,7 +61,13 @@
 </div>
 
 <script>
-    // Chart.js (159px balandlikka moslangan)
+    // Formani ko'rsatish/yashirish
+    function toggleForm() {
+        const form = document.getElementById('addForm');
+        form.classList.toggle('hidden');
+    }
+
+    // Chart.js
     new Chart(document.getElementById('mevaChart'), {
         type: 'bar',
         data: {
@@ -60,7 +77,7 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // Qidiruv va Edit funksiyalari
+    // Qidiruv
     document.getElementById('searchInput').addEventListener('keyup', e => {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('tbody tr').forEach(row => {
@@ -68,6 +85,7 @@
         });
     });
 
+    // Edit funksiyasi
     function editItem(id, soni, narxi) {
         const newSoni = prompt("Yangi soni:", soni);
         const newNarxi = prompt("Yangi narxi:", narxi);
