@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mevalar Ombori — Admin Panel</title>
+    <title>Fruit CRM Pro — Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            color: #1f2937;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
             margin: 0;
             padding: 20px 10px;
             display: flex;
@@ -20,273 +21,111 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 950px;
         }
 
-        /* TEPADAGI ASOSIY ADMIN PANEL */
+        /* HEADER */
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #ffffff;
-            padding: 14px 16px;
-            border-radius: 8px 8px 0 0;
-            border: 1px solid #d1d5db;
-            border-bottom: none;
+            padding: 10px 0;
+            margin-bottom: 20px;
         }
 
-        .logo-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #107c41;
+        .logo { font-size: 20px; font-weight: 700; color: #166534; }
+
+        .btn-add {
+            background: #166534; color: white; border: none; padding: 8px 16px;
+            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;
         }
 
-        .header-buttons {
-            display: flex;
-            gap: 8px;
+        /* DASHBOARD SECTION */
+        .dashboard-top {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
-        .btn-toggle-form {
-            background: #107c41;
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        /* Grafik kartasi */
+        .chart-card {
+            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
+            padding: 20px; display: flex; flex-direction: column; align-items: center;
         }
 
-        .btn-toggle-form:hover {
-            background: #0e6836;
+        .chart-card h4 { margin: 0 0 15px 0; font-size: 14px; color: #64748b; }
+
+        /* Jami Summa kartasi */
+        .summary-card {
+            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
+            padding: 25px; display: flex; flex-direction: column; justify-content: center;
+            text-align: center;
         }
 
-        .btn-logout {
-            background: white;
-            color: #4b5563;
-            border: 1px solid #d1d5db;
-            padding: 7px 14px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .summary-card span { font-size: 14px; color: #64748b; font-weight: 500; }
+        .summary-card h2 { margin: 10px 0 0 0; font-size: 32px; color: #166534; }
 
-        .btn-logout:hover {
-            background: #fef2f2;
-            color: #dc2626;
-            border-color: #fca5a5;
-        }
-
-        /* JONLI QIDIRUV PANEL-I */
-        .search-bar-container {
-            background: #f3f4f6;
-            padding: 10px 16px;
-            border: 1px solid #d1d5db;
-            border-bottom: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
+        /* SEARCH BAR */
+        .search-container {
+            margin-bottom: 15px; position: relative;
         }
 
         .search-input {
-            border: 1px solid #cbd5e0;
-            padding: 8px 12px 8px 34px;
-            font-size: 13px;
-            border-radius: 4px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-            background: white;
-            transition: all 0.2s;
+            width: 100%; padding: 12px 15px 12px 40px; border-radius: 12px;
+            border: 1px solid #e2e8f0; outline: none; font-size: 14px; box-sizing: border-box;
         }
 
-        .search-input:focus {
-            border-color: #107c41;
-            box-shadow: 0 0 0 2px rgba(16, 124, 65, 0.1);
-        }
+        .search-input:focus { border-color: #166534; }
 
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            color: #9ca3af;
-            pointer-events: none;
-        }
-
-        /* Silliq ochiluvchi forma */
-        .form-container {
-            background: #f9fafb;
-            border: 1px solid #d1d5db;
-            padding: 0px 16px;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            opacity: 0;
-        }
-
-        .form-container.show {
-            padding: 16px;
-            max-height: 180px;
-            opacity: 1;
-            border-bottom: none;
-        }
-
-        .excel-form {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .excel-form input {
-            border: 1px solid #d1d5db;
-            padding: 8px 12px;
-            font-size: 13px;
-            border-radius: 4px;
-            outline: none;
-            background: white;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .excel-form input:focus {
-            border-color: #107c41;
-        }
-
-        .btn-save-new {
-            background: #107c41;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Ixcham Chiziqli Jadval */
+        /* TABLE SECTION */
         .table-wrapper {
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 0 0 8px 8px;
-            overflow-x: auto;
+            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
+            overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 500px;
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        
+        th { 
+            background: #f8fafc; color: #64748b; font-weight: 600; 
+            padding: 12px 15px; text-align: left; border-bottom: 1px solid #f1f5f9;
         }
 
-        th {
-            background: #f3f4f6;
-            color: #374151;
-            font-weight: 600;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            text-align: left;
+        td { padding: 8px 15px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        tr:hover { background-color: #fcfdfc; }
+
+        /* RAMKASIZ INPUTLAR */
+        .edit-form { display: flex; align-items: center; gap: 8px; }
+        
+        .compact-input {
+            border: 1px solid transparent; background: transparent;
+            padding: 5px; font-size: 14px; width: 70px; outline: none;
+            transition: all 0.2s; border-radius: 4px;
         }
 
-        td {
-            padding: 6px 12px;
-            border: 1px solid #e5e7eb;
-            vertical-align: middle;
+        .compact-input:focus { border-color: #166534; background: #f0fdf4; }
+
+        /* RADIO/CHECKBOX STYLE */
+        .check-input {
+            width: 18px; height: 18px; cursor: pointer; accent-color: #166534;
         }
 
-        tr:hover td {
-            background-color: #f9fafb;
+        .btn-icon {
+            background: none; border: none; cursor: pointer; color: #94a3b8;
+            padding: 5px; transition: color 0.2s;
         }
 
-        /* Tahrirlash inputlari */
-        .edit-form {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin: 0;
+        .btn-icon:hover { color: #166534; }
+        .btn-delete:hover { color: #ef4444; }
+
+        /* FORMA */
+        .form-overlay {
+            display: none; background: white; border: 1px solid #e2e8f0;
+            padding: 20px; border-radius: 16px; margin-bottom: 20px;
         }
 
-        .input-box {
-            display: flex;
-            align-items: center;
-            background: #fdfdfd;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-
-        .input-box:focus-within {
-            border-color: #107c41;
-            background: white;
-        }
-
-        .cell-input {
-            border: none;
-            background: transparent;
-            padding: 4px;
-            font-size: 13px;
-            width: 55px;
-            outline: none;
-            font-family: inherit;
-            color: inherit;
-        }
-
-        .unit {
-            font-size: 11px;
-            color: #9ca3af;
-            padding-right: 2px;
-        }
-
-        .btn-cell-submit {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            color: #4b5563;
-            padding: 5px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-cell-submit:hover {
-            background: #e1f1e9;
-            border-color: #107c41;
-            color: #107c41;
-        }
-
-        .btn-trash {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            background: transparent;
-            color: #9ca3af;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-trash:hover {
-            background: #fee2e2;
-            color: #ef4444;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #9ca3af;
-            padding: 20px !important;
+        @media (max-width: 768px) {
+            .dashboard-top { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -295,82 +134,78 @@
 <div class="container">
     
     <div class="admin-header">
-        <div class="logo-title">Admin Panel — Ombor hisoboti</div>
-        <div class="header-buttons">
-            <button class="btn-toggle-form" onclick="toggleForm()">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                Yangi meva
-            </button>
-            <a href="/logout" class="btn-logout">Chiqish</a>
+        <div class="logo">Fruit Pro Dashboard</div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-add" onclick="toggleForm()">+ Mahsulot</button>
+            <a href="/logout" style="text-decoration: none; font-size: 13px; color: #ef4444; font-weight: 600; padding: 8px;">Chiqish</a>
         </div>
     </div>
 
-    <div class="search-bar-container">
-        <div class="search-box">
-            <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text" id="searchInput" class="search-input" placeholder="Ombordan qidirish..." oninput="liveSearch()">
-        </div>
-    </div>
-
-    <div class="form-container" id="newMevaForm">
-        <form action="/meva/qoshish" method="POST" class="excel-form">
-            <input type="text" name="nomi" placeholder="Meva nomi" required>
-            <input type="number" name="soni" placeholder="Soni (ta)" min="0" required>
-            <input type="number" name="narxi" placeholder="Narxi (so'm)" min="0" required>
-            <button type="submit" class="btn-save-new">Qo'shish</button>
+    <div class="form-overlay" id="addForm">
+        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
+            <input type="number" name="soni" placeholder="Soni" style="width: 80px; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
+            <input type="number" name="narxi" placeholder="Narxi" style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
+            <button type="submit" class="btn-add">Saqlash</button>
         </form>
+    </div>
+
+    <div class="dashboard-top">
+        <div class="chart-card">
+            <h4>Zaxira ulushi (%)</h4>
+            <canvas id="fruitChart" width="180" height="180"></canvas>
+        </div>
+        <div class="summary-card">
+            <span>Tanlangan mahsulotlar jami:</span>
+            <h2 id="totalDisplay">0 so'm</h2>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <span style="position: absolute; left: 15px; top: 12px; color: #94a3b8;">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Mahsulotlarni izlash..." onkeyup="liveSearch()">
     </div>
 
     <div class="table-wrapper">
         <table id="mevaTable">
             <thead>
                 <tr>
-                    <th style="width: 50px; text-align: center;">ID</th>
-                    <th style="width: 140px;">Mahsulot Nomi</th>
-                    <th>Miqdori va Narxi (O'zgartirish)</th>
-                    <th style="width: 70px; text-align: center;">O'chirish</th>
+                    <th style="width: 30px;"></th>
+                    <th style="width: 40px;">ID</th>
+                    <th>Mahsulot</th>
+                    <th>Zaxira</th>
+                    <th>Narx</th>
+                    <th style="width: 80px; text-align: right;">Amal</th>
                 </tr>
             </thead>
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
                     <% mevalar.forEach((meva) => { %>
                         <tr class="meva-row">
-                            <td style="color: #6b7280; text-align: center; font-weight: 500;">#<%= meva.id %></td>
-                            <td class="meva-name" style="font-weight: 500; color: #111827;"><%= meva.nomi %></td>
-                            
                             <td>
-                                <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
-                                    <div class="input-box">
-                                        <input type="number" name="soni" class="cell-input" value="<%= meva.soni %>" required>
-                                        <span class="unit">ta</span>
-                                    </div>
-                                    <div class="input-box">
-                                        <input type="number" name="narxi" class="cell-input" style="width: 75px;" value="<%= meva.narxi %>" required>
-                                        <span class="unit">so'm</span>
-                                    </div>
-                                    <button type="submit" class="btn-cell-submit" title="Saqlash">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                        </svg>
-                                    </button>
-                                </form>
+                                <input type="checkbox" class="check-input" 
+                                       data-price="<%= meva.narxi %>" 
+                                       data-count="<%= meva.soni %>"
+                                       onchange="calculateTotal()">
                             </td>
-
-                            <td style="text-align: center;">
-                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-trash" title="O'chirish" onclick="return confirm('O\'chirilsinmi?')">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </a>
-                            </td>
+                            <td style="color: #94a3b8;">#<%= meva.id %></td>
+                            <td class="meva-name" style="font-weight: 600;"><%= meva.nomi %></td>
+                            <form action="/meva/tahrirlash/<%= meva.id %>" method="POST">
+                                <td>
+                                    <input type="number" name="soni" class="compact-input" value="<%= meva.soni %>" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="narxi" class="compact-input" style="width: 100px;" value="<%= meva.narxi %>" required>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" class="btn-icon" title="Saqlash">💾</button>
+                                    <a href="/meva/ochirish/<%= meva.id %>" class="btn-icon btn-delete" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
+                                </td>
+                            </form>
                         </tr>
                     <% }) %>
                 <% } else { %>
-                    <tr>
-                        <td colspan="4" class="no-data">Ombor bo'sh. Mahsulot kiritilmagan.</td>
-                    </tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #94a3b8;">Ma'lumotlar mavjud emas.</td></tr>
                 <% } %>
             </tbody>
         </table>
@@ -378,31 +213,62 @@
 </div>
 
 <script>
+    // FORM TOGGLE
     function toggleForm() {
-        const form = document.getElementById('newMevaForm');
-        form.classList.toggle('show');
+        const f = document.getElementById('addForm');
+        f.style.display = (f.style.display === 'block') ? 'none' : 'block';
     }
 
-    // YANGI TUZATILGAN JONLI QIDIRUV SCRIPT-I
+    // SEARCH
     function liveSearch() {
-        const searchInput = document.getElementById('searchInput');
-        const filter = searchInput.value.toLowerCase().trim();
+        const filter = document.getElementById('searchInput').value.toLowerCase();
         const rows = document.querySelectorAll('.meva-row');
-
         rows.forEach(row => {
-            const nameElement = row.querySelector('.meva-name');
-            if (nameElement) {
-                const nameText = nameElement.textContent || nameElement.innerText;
-                
-                // Agar qidiruv so'zi nom ichida bo'lsa, qatorni ko'rsat, bo'lmasa yashir
-                if (nameText.toLowerCase().includes(filter)) {
-                    row.style.display = ""; // Standart ko'rinish
-                } else {
-                    row.style.display = "none"; // Yashirish
-                }
-            }
+            const name = row.querySelector('.meva-name').textContent.toLowerCase();
+            row.style.display = name.includes(filter) ? "" : "none";
         });
     }
+
+    // DINAMIK JAMI SUMMANI HISOBLASH
+    function calculateTotal() {
+        let total = 0;
+        const checks = document.querySelectorAll('.check-input:checked');
+        checks.forEach(chk => {
+            const price = parseFloat(chk.getAttribute('data-price'));
+            const count = parseFloat(chk.getAttribute('data-count'));
+            total += (price * count);
+        });
+        document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
+    }
+
+    // DONUT CHART (Chart.js)
+    const ctx = document.getElementById('fruitChart').getContext('2d');
+    const labels = [];
+    const data = [];
+    
+    <% mevalar.forEach(m => { %>
+        labels.push('<%= m.nomi %>');
+        data.push(<%= m.soni %>);
+    <% }) %>
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#166534', '#22c55e', '#86efac', '#bbf7d0', '#dcfce7'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            cutout: '75%',
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
 </script>
 
 </body>
