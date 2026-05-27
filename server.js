@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// PostgreSQL ulanishi (Render muhiti uchun SSL yoqilgan)
+// PostgreSQL ulanishi (Render uchun SSL yoqilgan)
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('render.com') 
@@ -15,24 +15,26 @@ const pool = new Pool({
         : false
 });
 
+// Ma'lumotlarni o'qish uchun sozlamalar
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Sessiyani PG bazada saqlash (Logindan otib yubormaslik uchun)
+// Sessiyani PostgreSQL bazasida xavfsiz saqlash (Logindan otib yubormaslik uchun)
 app.use(session({
     store: new pgSession({
         pool: pool,
-        tableName: 'session'
+        tableName: 'session' // Bazadagi maxsus session jadvali
     }),
     secret: 'mevalar_maxfiy_kalit_123', 
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 kun
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 kun saqlaydi
         secure: false 
     }
 }));
 
+// Papka va shablon sozlamalari
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -45,7 +47,12 @@ function checkAuth(req, res, next) {
     res.redirect('/login');
 }
 
-// LOGIN
+// 1. ASOSIY SAHIFA
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
+
+// 2. LOGIN (GET va POST)
 app.get('/login', (req, res) => {
     if (req.session.isLoggedIn) return res.redirect('/admin');
     res.render('login', { error: null }); 
@@ -53,11 +60,15 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
+    
+    // Kirish ma'lumotlari
     if (username === 'admin' && password === '12345') {
         req.session.isLoggedIn = true;
         req.session.username = username;
+        
+        // Render barqaror ishlashi uchun sessiyani saqlab, keyin yo'naltiramiz
         req.session.save((err) => {
-            if (err) console.error(err);
+            if (err) console.error("Sessiya saqlashda xato:", err);
             return res.redirect('/admin');
         });
     } else {
@@ -65,18 +76,18 @@ app.post('/login', (req, res) => {
     }
 });
 
-// ADMIN PANEL
+// 3. ADMIN PANEL (Faqat login qilganlar kiradi)
 app.get('/admin', checkAuth, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM mevalar ORDER BY id DESC');
         res.render('admin', { mevalar: result.rows });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Xatolik yuz berdi');
+        console.error("Bazadan ma'lumot olishda xato:", err);
+        res.status(500).send('Internal Server Error: Bazadan maʼlumot olishda xatolik.');
     }
 });
 
-// MEVA QO'SHISH
+// 4. MEVA QO'SHISH (POST /admin/add)
 app.post('/admin/add', checkAuth, async (req, res) => {
     const { nomi, soni, narxi } = req.body;
     try {
@@ -86,22 +97,20 @@ app.post('/admin/add', checkAuth, async (req, res) => {
         );
         res.redirect('/admin');
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Xatolik yuz berdi');
+        console.error("Meva qo'shishda xato:", err);
+        res.status(500).send('Internal Server Error: Meva qoʻshishda xatolik yuz berdi.');
     }
 });
 
-// LOGOUT
+// 5. TIZIMDAN CHIQISH (LOGOUT)
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
+    req.session.destroy((err) => {
+        if (err) console.error(err);
         res.redirect('/login');
     });
 });
 
-app.get('/', (req, res) => {
-    res.redirect('/login');
-});
-
+// Serverni ishga tushirish
 app.listen(PORT, () => {
     console.log(`Server portda ishga tushdi: ${PORT}`);
 });
