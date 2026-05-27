@@ -2,50 +2,39 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ombor Boshqaruvi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: sans-serif; background: #f8fafc; }
-        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
-        #addForm { transition: all 0.3s ease; }
-    </style>
 </head>
-<body class="p-4 md:p-8">
-
+<body class="bg-slate-50 p-6">
 <div class="max-w-5xl mx-auto">
-    <div class="card p-4 mb-6 shadow-sm" style="height: 159px;">
+    <div class="card p-4 mb-6 bg-white rounded-xl shadow-sm border" style="height: 159px;">
         <canvas id="mevaChart"></canvas>
     </div>
 
     <div class="flex gap-2 mb-4 items-center">
-        <button onclick="toggleForm()" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 shadow-lg">
-            <i class="fa-solid fa-plus"></i>
-        </button>
+        <button onclick="document.getElementById('addForm').classList.toggle('hidden')" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 shadow-lg"><i class="fa-solid fa-plus"></i></button>
         <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg flex-1">
         <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="fa-solid fa-file-excel"></i></button>
     </div>
 
-    <form id="addForm" action="/meva/qoshish" method="POST" class="hidden card p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-2 shadow-md">
+    <form id="addForm" action="/meva/qoshish" method="POST" class="hidden bg-white p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-2 border rounded-xl shadow-sm">
         <input type="text" name="nomi" placeholder="Nomi" class="border p-2 rounded" required>
         <input type="number" name="narxi" placeholder="Narxi" class="border p-2 rounded" required>
         <input type="number" name="soni" placeholder="Soni" class="border p-2 rounded" required>
         <button class="bg-indigo-600 text-white p-2 rounded">Saqlash</button>
     </form>
 
-    <div class="card shadow-sm overflow-x-auto">
+    <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
         <table class="w-full text-left" id="mevaTable">
-            <thead>
-                <tr class="text-gray-400 text-xs uppercase border-b">
-                    <th class="p-3">Nomi</th><th class="p-3">Narxi</th><th class="p-3">Soni</th><th class="p-3">Amallar</th>
-                </tr>
+            <thead class="text-gray-400 text-xs uppercase border-b">
+                <tr><th class="p-3">Nomi</th><th class="p-3">Narxi</th><th class="p-3">Soni</th><th class="p-3">Amallar</th></tr>
             </thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="border-b hover:bg-gray-50 text-sm">
+                <tr class="border-b hover:bg-slate-50 text-sm">
                     <td class="p-3 font-semibold"><%= m.nomi %></td>
                     <td class="p-3"><%= m.narxi %></td>
                     <td class="p-3"><%= m.soni %></td>
@@ -61,46 +50,27 @@
 </div>
 
 <script>
-    // Formani ko'rsatish/yashirish
-    function toggleForm() {
-        const form = document.getElementById('addForm');
-        form.classList.toggle('hidden');
-    }
-
-    // Chart.js
     new Chart(document.getElementById('mevaChart'), {
         type: 'bar',
-        data: {
-            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
-            datasets: [{ label: 'Soni', data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, backgroundColor: '#6366f1' }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        data: { labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>, datasets: [{ label: 'Soni', data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, backgroundColor: '#6366f1' }] },
+        options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // Qidiruv
     document.getElementById('searchInput').addEventListener('keyup', e => {
         const val = e.target.value.toLowerCase();
-        document.querySelectorAll('tbody tr').forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
-        });
+        document.querySelectorAll('tbody tr').forEach(row => row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none');
     });
 
-    // Edit funksiyasi
     function editItem(id, soni, narxi) {
-        const newSoni = prompt("Yangi soni:", soni);
-        const newNarxi = prompt("Yangi narxi:", narxi);
-        if (newSoni !== null && newNarxi !== null) {
-            fetch(`/meva/tahrirlash/${id}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({soni: newSoni, narxi: newNarxi})
-            }).then(() => { alert("Yangilandi!"); location.reload(); });
+        const nS = prompt("Yangi soni:", soni);
+        const nN = prompt("Yangi narxi:", narxi);
+        if (nS && nN) {
+            fetch(`/meva/tahrirlash/${id}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({soni: nS, narxi: nN}) }).then(() => location.reload());
         }
     }
 
     function exportToExcel() {
-        const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
-        XLSX.writeFile(wb, "Ombor.xlsx");
+        XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById('mevaTable')), "Ombor.xlsx");
     }
 </script>
 </body>
