@@ -3,286 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Admin Panel - Mevalar Ombori</title>
+    <title>Minimalist Dashboard</title>
     <style>
-        /* Google Fonts dan zamonaviy shrift yuklash */
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #10b981;
-            --primary-hover: #059669;
-            --primary-glow: rgba(16, 185, 129, 0.2);
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-        }
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            color: #111111;
             margin: 0;
-            padding: 40px 20px;
+            padding: 50px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
 
         .container {
             width: 100%;
-            max-width: 950px;
-            /* Sahifa ochilgandagi chiroyli animatsiya */
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 850px;
         }
 
-        /* Tepadagi Header qismi */
+        /* Yengil va toza Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 20px;
         }
 
         h1 {
+            font-size: 22px;
+            font-weight: 600;
             margin: 0;
-            font-size: 26px;
-            font-weight: 700;
-            background: linear-gradient(to right, #10b981, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #111;
         }
 
         .logout-btn {
-            padding: 10px 20px;
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+            font-size: 13px;
+            color: #666;
             text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            transition: all 0.2s;
         }
 
         .logout-btn:hover {
-            background: var(--danger);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            color: #111;
+            border-color: #111;
         }
 
-        /* Yangi meva qo'shish kartasi */
-        .crud-card {
-            background: var(--card-bg);
-            padding: 25px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 35px;
+        /* Minimal Forma */
+        .form-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
         }
 
-        .crud-card h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: var(--text-main);
-            font-size: 18px;
+        .form-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .form-group input {
-            background: #1e293b;
-            color: white;
-            padding: 14px 16px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            flex: 1;
-            min-width: 180px;
-            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px 14px;
             font-size: 14px;
-            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 160px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        /* Inputga bosilgandagi neon effekt */
         .form-group input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 15px var(--primary-glow);
-            background: #0f172a;
+            border-color: #111;
         }
 
         .btn-add {
-            background: var(--primary);
+            background: #111;
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 6px;
             font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
         }
 
         .btn-add:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            background: #333;
         }
 
-        /* Jadval (Table) dizayni */
-        .table-container {
-            background: var(--card-bg);
-            border-radius: 16px;
+        /* Minimalist Jadval */
+        .table-wrapper {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
         }
 
         th {
-            background: #111827;
-            color: var(--text-muted);
-            padding: 16px 24px;
-            font-size: 13px;
+            background: #f9fafb;
+            color: #4b5563;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            padding: 14px 20px;
+            border-bottom: 1px solid #e5e7eb;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid #334155;
         }
 
         td {
-            padding: 18px 24px;
-            border-bottom: 1px solid #334155;
-            font-size: 15px;
-            color: var(--text-main);
-            transition: background 0.2s ease;
-        }
-
-        /* Qator ustiga kelgandagi chiroyli effekt */
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            padding: 14px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
         }
 
         tr:last-child td {
             border-bottom: none;
         }
 
-        .meva-nomi {
-            font-weight: 600;
-            color: #fff;
-            font-size: 16px;
+        .meva-title {
+            font-weight: 500;
+            color: #111;
         }
 
-        /* Tahrirlash (Inline Edit) Formasi */
+        /* Tahrirlash formasi */
         .edit-form {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 0;
+            gap: 8px;
         }
 
         .edit-form input {
-            background: #0f172a;
-            color: white;
-            border: 1px solid #334155;
-            padding: 8px 12px;
-            border-radius: 8px;
-            width: 85px;
-            font-family: inherit;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 6px 10px;
+            width: 80px;
+            font-size: 13px;
+            outline: none;
         }
 
         .edit-form input:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+            border-color: #111;
         }
 
         .btn-update {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 8px 14px;
-            border-radius: 8px;
+            background: none;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s ease;
+            font-size: 12px;
+            transition: all 0.2s;
         }
 
         .btn-update:hover {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            background: #f9fafb;
+            border-color: #111;
+            color: #111;
         }
 
-        /* O'chirish tugmasi */
+        /* O'chirish havolasi */
         .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+            color: #9ca3af;
             text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 8px;
             font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            transition: all 0.2s ease;
-            display: inline-block;
+            transition: color 0.2s;
         }
 
         .btn-delete:hover {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            color: #ef4444;
         }
 
-        .empty-msg {
+        .no-data {
             text-align: center;
-            color: var(--text-muted);
-            padding: 40px !important;
-            font-style: italic;
-        }
-
-        /* Animatsiya qoidalari */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            color: #6b7280;
+            padding: 30px !important;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -290,55 +209,51 @@
 
 <div class="container">
     <div class="header">
-        <h1>⚙️ Dashboard <span style="font-size: 16px; color: var(--text-muted); font-weight: 400;">/ Mevalar Ombori</span></h1>
-        <a href="/logout" class="logout-btn">Chiqish 🚪</a>
+        <h1>Mevalar ombori</h1>
+        <a href="/logout" class="logout-btn">Chiqish</a>
     </div>
 
-    <div class="crud-card">
-        <h3>➕ Yangi Mahsulot Qo'shish</h3>
+    <div class="form-card">
+        <h3>Yangi mahsulot qo'shish</h3>
         <form action="/meva/qoshish" method="POST" class="form-group">
-            <input type="text" name="nomi" placeholder="Meva nomi (Masalan: Gilos)" required>
-            <input type="number" name="soni" placeholder="Soni (Shtuk)" min="0" required>
-            <input type="number" name="narxi" placeholder="Narxi (So'm)" min="0" step="0.01" required>
-            <button type="submit" class="btn-add">Omborga qo'shish</button>
+            <input type="text" name="nomi" placeholder="Meva nomi" required>
+            <input type="number" name="soni" placeholder="Soni (ta)" min="0" required>
+            <input type="number" name="narxi" placeholder="Narxi (so'm)" min="0" required>
+            <button type="submit" class="btn-add">Qo'shish</button>
         </form>
     </div>
 
-    <div class="table-container">
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 80px;">ID</th>
-                    <th>Meva Nomi</th>
-                    <th>Miqdori va Narxi (Jonli tahrirlash)</th>
-                    <th style="width: 120px;">Amal</th>
+                    <th style="width: 60px;">ID</th>
+                    <th>Nomi</th>
+                    <th>Miqdori va narxi</th>
+                    <th style="width: 90px; text-align: right;">Amal</th>
                 </tr>
             </thead>
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
                     <% mevalar.forEach(meva => { %>
                         <tr>
-                            <td><span style="color: var(--text-muted);">#<%= meva.id %></span></td>
-                            <td><span class="meva-nomi"><%= meva.nomi %></span></td>
+                            <td style="color: #9ca3af;">#<%= meva.id %></td>
+                            <td><span class="meva-title"><%= meva.nomi %></span></td>
                             <td>
                                 <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
-                                    <input type="number" name="soni" value="<%= meva.soni %>" title="Soni" required>
-                                    <span style="color: var(--text-muted); font-size: 13px;">ta</span>
-                                    
-                                    <input type="number" name="narxi" value="<%= meva.narxi %>" title="Narxi" step="0.01" required>
-                                    <span style="color: var(--text-muted); font-size: 13px;">so'm</span>
-                                    
+                                    <input type="number" name="soni" value="<%= meva.soni %>" required> <span style="color: #9ca3af;">ta</span>
+                                    <input type="number" name="narxi" value="<%= meva.narxi %>" required> <span style="color: #9ca3af;">so'm</span>
                                     <button type="submit" class="btn-update">Saqlash</button>
                                 </form>
                             </td>
-                            <td>
-                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-delete" onclick="return confirm('Haqiqatdan ham ushbu mahsulotni ombordan o\'chirmoqchimisiz?')">O'chirish</a>
+                            <td style="text-align: right;">
+                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-delete" onclick="return confirm('O\'chirilsinmi?')">O'chirish</a>
                             </td>
                         </tr>
                     <% }) %>
                 <% } else { %>
                     <tr>
-                        <td colspan="4" class="empty-msg">📦 Omborda hech qanday mahsulot topilmadi. Yuqoridan qo'shishingiz mumkin.</td>
+                        <td colspan="4" class="no-data">Mahsulotlar mavjud emas.</td>
                     </tr>
                 <% } %>
             </tbody>
