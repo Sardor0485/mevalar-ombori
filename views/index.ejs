@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit CRM Pro — Dashboard</title>
+    <title>Fruit Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -11,171 +11,149 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
-            color: #0f172a;
+            color: #1e293b;
             margin: 0;
-            padding: 20px 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .container {
-            width: 100%;
-            max-width: 950px;
-        }
+        .container { width: 100%; max-width: 850px; }
 
-        /* HEADER */
-        .admin-header {
+        /* TEPADAGI NAV */
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+        .logo { font-size: 16px; font-weight: 800; color: #10b981; }
+        
+        .btn-main {
+            background: #10b981; color: white; border: none; padding: 5px 12px;
+            border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 12px;
         }
 
-        .logo { font-size: 20px; font-weight: 700; color: #166534; }
-
-        .btn-add {
-            background: #166534; color: white; border: none; padding: 8px 16px;
-            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;
+        /* 4 BAROVAR KICHRAYTIRILGAN MINI PANEL */
+        .mini-stat-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 4px 12px;
+            margin-bottom: 10px;
+            height: 38px; /* O'ta ixcham balandlik */
+            box-sizing: border-box;
         }
 
-        /* DASHBOARD SECTION */
-        .dashboard-top {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
+        .stat-left { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #475569; }
+        .chart-micro-box { width: 22px; height: 22px; display: flex; align-items: center; } /* Micro Grafik */
 
-        /* Grafik kartasi */
-        .chart-card {
-            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
-            padding: 20px; display: flex; flex-direction: column; align-items: center;
-        }
+        .total-right { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .total-label { color: #64748b; font-weight: 500; }
+        .total-value { font-weight: 700; color: #10b981; }
 
-        .chart-card h4 { margin: 0 0 15px 0; font-size: 14px; color: #64748b; }
-
-        /* Jami Summa kartasi */
-        .summary-card {
-            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
-            padding: 25px; display: flex; flex-direction: column; justify-content: center;
-            text-align: center;
-        }
-
-        .summary-card span { font-size: 14px; color: #64748b; font-weight: 500; }
-        .summary-card h2 { margin: 10px 0 0 0; font-size: 32px; color: #166534; }
-
-        /* SEARCH BAR */
-        .search-container {
-            margin-bottom: 15px; position: relative;
-        }
-
+        /* POISK (QIDIRUV) */
+        .search-row { margin-bottom: 10px; position: relative; }
         .search-input {
-            width: 100%; padding: 12px 15px 12px 40px; border-radius: 12px;
-            border: 1px solid #e2e8f0; outline: none; font-size: 14px; box-sizing: border-box;
+            width: 100%; padding: 8px 12px 8px 34px; border-radius: 6px;
+            border: 1px solid #cbd5e1; background: #ffffff; font-size: 13px; outline: none;
+            box-sizing: border-box;
         }
+        .search-input:focus { border-color: #10b981; }
+        .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 13px; }
 
-        .search-input:focus { border-color: #166534; }
-
-        /* TABLE SECTION */
-        .table-wrapper {
-            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
-            overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* JADVAL */
+        .table-card {
+            background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;
         }
-
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8fafc; padding: 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
         
-        th { 
-            background: #f8fafc; color: #64748b; font-weight: 600; 
-            padding: 12px 15px; text-align: left; border-bottom: 1px solid #f1f5f9;
-        }
-
-        td { padding: 8px 15px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
-        tr:hover { background-color: #fcfdfc; }
-
         /* RAMKASIZ INPUTLAR */
-        .edit-form { display: flex; align-items: center; gap: 8px; }
-        
-        .compact-input {
+        .borderless-input {
             border: 1px solid transparent; background: transparent;
-            padding: 5px; font-size: 14px; width: 70px; outline: none;
-            transition: all 0.2s; border-radius: 4px;
+            padding: 4px; font-size: 13px; width: 60px; outline: none;
+            border-radius: 4px; font-weight: 500;
         }
+        .borderless-input:focus { border-color: #10b981; background: #f0fdf4; }
 
-        .compact-input:focus { border-color: #166534; background: #f0fdf4; }
+        .check-custom { width: 15px; height: 15px; accent-color: #10b981; cursor: pointer; }
 
-        /* RADIO/CHECKBOX STYLE */
-        .check-input {
-            width: 18px; height: 18px; cursor: pointer; accent-color: #166534;
+        /* AMALLAR (EDIT & DEL) */
+        .actions-group { display: flex; gap: 5px; justify-content: flex-end; }
+        
+        .btn-action-save {
+            background: #e6f4ea; color: #137333; border: none; 
+            padding: 4px 8px; border-radius: 4px; font-size: 11px; 
+            font-weight: 600; cursor: pointer;
         }
+        .btn-action-save:hover { background: #137333; color: white; }
 
-        .btn-icon {
-            background: none; border: none; cursor: pointer; color: #94a3b8;
-            padding: 5px; transition: color 0.2s;
+        .btn-action-del {
+            background: #fce8e6; color: #c5221f; border: none; 
+            padding: 4px 8px; border-radius: 4px; font-size: 11px; 
+            font-weight: 600; cursor: pointer; text-decoration: none;
         }
+        .btn-action-del:hover { background: #c5221f; color: white; }
 
-        .btn-icon:hover { color: #166534; }
-        .btn-delete:hover { color: #ef4444; }
-
-        /* FORMA */
-        .form-overlay {
-            display: none; background: white; border: 1px solid #e2e8f0;
-            padding: 20px; border-radius: 16px; margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-top { grid-template-columns: 1fr; }
-        }
+        #addForm { display: none; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     
-    <div class="admin-header">
-        <div class="logo">Fruit Pro Dashboard</div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-add" onclick="toggleForm()">+ Mahsulot</button>
-            <a href="/logout" style="text-decoration: none; font-size: 13px; color: #ef4444; font-weight: 600; padding: 8px;">Chiqish</a>
+    <div class="top-nav">
+        <div class="logo">FRUIT OMBOR</div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
+            <a href="/logout" style="font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; align-self: center; padding: 2px 5px;">Chiqish</a>
         </div>
     </div>
 
-    <div class="form-overlay" id="addForm">
-        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
-            <input type="number" name="soni" placeholder="Soni" style="width: 80px; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
-            <input type="number" name="narxi" placeholder="Narxi" style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;" required>
-            <button type="submit" class="btn-add">Saqlash</button>
+    <div class="mini-stat-bar">
+        <div class="stat-left">
+            <div class="chart-micro-box">
+                <canvas id="miniChart"></canvas>
+            </div>
+            <span>Ombor zaxirasi</span>
+        </div>
+        
+        <div class="total-right">
+            <span class="total-label">Tanlangan jami:</span>
+            <span class="total-value" id="totalDisplay">0 so'm</span>
+        </div>
+    </div>
+
+    <div id="addForm">
+        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 6px;">
+            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+            <input type="number" name="soni" placeholder="Soni" style="width: 50px; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+            <input type="number" name="narxi" placeholder="Narxi" style="width: 90px; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+            <button type="submit" class="btn-main">Saqlash</button>
         </form>
     </div>
 
-    <div class="dashboard-top">
-        <div class="chart-card">
-            <h4>Zaxira ulushi (%)</h4>
-            <canvas id="fruitChart" width="180" height="180"></canvas>
-        </div>
-        <div class="summary-card">
-            <span>Tanlangan mahsulotlar jami:</span>
-            <h2 id="totalDisplay">0 so'm</h2>
-        </div>
+    <div class="search-row">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Meva nomini yozib qidiring..." oninput="liveSearch()">
     </div>
 
-    <div class="search-container">
-        <span style="position: absolute; left: 15px; top: 12px; color: #94a3b8;">🔍</span>
-        <input type="text" id="searchInput" class="search-input" placeholder="Mahsulotlarni izlash..." onkeyup="liveSearch()">
-    </div>
-
-    <div class="table-wrapper">
+    <div class="table-card">
         <table id="mevaTable">
             <thead>
                 <tr>
-                    <th style="width: 30px;"></th>
-                    <th style="width: 40px;">ID</th>
-                    <th>Mahsulot</th>
-                    <th>Zaxira</th>
-                    <th>Narx</th>
-                    <th style="width: 80px; text-align: right;">Amal</th>
+                    <th style="width: 20px;"></th>
+                    <th>Nomi</th>
+                    <th style="width: 75px;">Soni</th>
+                    <th style="width: 100px;">Narxi (so'm)</th>
+                    <th style="width: 110px; text-align: right;">Amallar</th>
                 </tr>
             </thead>
             <tbody>
@@ -183,29 +161,26 @@
                     <% mevalar.forEach((meva) => { %>
                         <tr class="meva-row">
                             <td>
-                                <input type="checkbox" class="check-input" 
+                                <input type="checkbox" class="check-custom" 
                                        data-price="<%= meva.narxi %>" 
                                        data-count="<%= meva.soni %>"
                                        onchange="calculateTotal()">
                             </td>
-                            <td style="color: #94a3b8;">#<%= meva.id %></td>
-                            <td class="meva-name" style="font-weight: 600;"><%= meva.nomi %></td>
+                            <td class="meva-name" style="font-weight: 600; color: #334155;"><%= meva.nomi %></td>
                             <form action="/meva/tahrirlash/<%= meva.id %>" method="POST">
+                                <td><input type="number" name="soni" class="borderless-input" value="<%= meva.soni %>" required></td>
+                                <td><input type="number" name="narxi" class="borderless-input" style="width: 75px;" value="<%= meva.narxi %>" required></td>
                                 <td>
-                                    <input type="number" name="soni" class="compact-input" value="<%= meva.soni %>" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="narxi" class="compact-input" style="width: 100px;" value="<%= meva.narxi %>" required>
-                                </td>
-                                <td style="text-align: right;">
-                                    <button type="submit" class="btn-icon" title="Saqlash">💾</button>
-                                    <a href="/meva/ochirish/<%= meva.id %>" class="btn-icon btn-delete" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
+                                    <div class="actions-group">
+                                        <button type="submit" class="btn-action-save">Edit</button>
+                                        <a href="/meva/ochirish/<%= meva.id %>" class="btn-action-del" onclick="return confirm('O\'chirilsinmi?')">Del</a>
+                                    </div>
                                 </td>
                             </form>
                         </tr>
                     <% }) %>
                 <% } else { %>
-                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #94a3b8;">Ma'lumotlar mavjud emas.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Mavjud emas.</td></tr>
                 <% } %>
             </tbody>
         </table>
@@ -213,15 +188,13 @@
 </div>
 
 <script>
-    // FORM TOGGLE
     function toggleForm() {
         const f = document.getElementById('addForm');
         f.style.display = (f.style.display === 'block') ? 'none' : 'block';
     }
 
-    // SEARCH
     function liveSearch() {
-        const filter = document.getElementById('searchInput').value.toLowerCase();
+        const filter = document.getElementById('searchInput').value.toLowerCase().trim();
         const rows = document.querySelectorAll('.meva-row');
         rows.forEach(row => {
             const name = row.querySelector('.meva-name').textContent.toLowerCase();
@@ -229,23 +202,21 @@
         });
     }
 
-    // DINAMIK JAMI SUMMANI HISOBLASH
     function calculateTotal() {
         let total = 0;
-        const checks = document.querySelectorAll('.check-input:checked');
+        const checks = document.querySelectorAll('.check-custom:checked');
         checks.forEach(chk => {
-            const price = parseFloat(chk.getAttribute('data-price'));
-            const count = parseFloat(chk.getAttribute('data-count'));
-            total += (price * count);
+            const p = parseFloat(chk.getAttribute('data-price'));
+            const c = parseFloat(chk.getAttribute('data-count'));
+            total += (p * c);
         });
         document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
     }
 
-    // DONUT CHART (Chart.js)
-    const ctx = document.getElementById('fruitChart').getContext('2d');
+    // MICRO DONUT CHART SCRIPT
+    const ctx = document.getElementById('miniChart').getContext('2d');
     const labels = [];
     const data = [];
-    
     <% mevalar.forEach(m => { %>
         labels.push('<%= m.nomi %>');
         data.push(<%= m.soni %>);
@@ -257,16 +228,16 @@
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: ['#166534', '#22c55e', '#86efac', '#bbf7d0', '#dcfce7'],
-                borderWidth: 0,
-                hoverOffset: 10
+                backgroundColor: ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#9b5de5', '#f15bb5', '#10b981'],
+                borderWidth: 1,
+                borderColor: '#ffffff'
             }]
         },
         options: {
-            cutout: '75%',
-            plugins: {
-                legend: { display: false }
-            }
+            cutout: '70%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } } // Ortiqcha tooltip o'chirildi
         }
     });
 </script>
