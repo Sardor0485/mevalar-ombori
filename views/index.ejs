@@ -2,41 +2,51 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ombor Boshqaruvi</title>
+    <title>Minimal Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .card { background: #ffffff; border: 1px solid #f0f0f0; border-radius: 20px; }
+    </style>
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="bg-[#FAFAFA] p-6 md:p-12">
 
-<div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
-    <h1 class="text-2xl font-bold mb-6">📦 Ombor Boshqaruvi</h1>
-
-    <div class="flex flex-wrap gap-4 mb-6">
-        <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="border p-2 rounded-lg flex-1">
-        <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Excel Export</button>
-        <div class="bg-purple-100 px-4 py-2 rounded-lg font-bold">Jami: <span id="totalSum">0</span> so'm</div>
+<div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-end mb-10">
+        <div>
+            <h1 class="text-3xl font-semibold text-gray-900">Ombor</h1>
+            <p class="text-gray-400">Minimalist boshqaruv paneli</p>
+        </div>
+        <button onclick="exportToExcel()" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition">Yuklab olish ↗</button>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse" id="mevaTable">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card p-6 shadow-sm">
+            <span class="text-gray-400 text-xs uppercase tracking-widest">Jami Summa</span>
+            <div class="text-2xl font-semibold mt-1" id="totalSum">0</div>
+        </div>
+    </div>
+
+    <input type="text" id="searchInput" placeholder="Qidirish..." class="w-full bg-white border border-gray-100 rounded-xl p-4 mb-6 shadow-sm outline-none focus:border-blue-200 transition">
+
+    <div class="card p-2 overflow-x-auto">
+        <table class="w-full text-left border-collapse" id="mevaTable">
             <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-3"><input type="checkbox" id="selectAll"></th>
-                    <th class="p-3">Nomi</th>
-                    <th class="p-3">Narxi</th>
-                    <th class="p-3">Soni</th>
-                    <th class="p-3">Jami</th>
+                <tr class="text-gray-400 text-xs uppercase">
+                    <th class="p-4">Tanlash</th>
+                    <th class="p-4">Nomi</th>
+                    <th class="p-4">Narxi</th>
+                    <th class="p-4">Soni</th>
                 </tr>
             </thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3 text-center"><input type="checkbox" class="rowCheckbox" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
-                    <td class="p-3"><%= m.nomi %></td>
-                    <td class="p-3"><%= m.narxi %></td>
-                    <td class="p-3"><%= m.soni %></td>
-                    <td class="p-3"><%= m.narxi * m.soni %></td>
+                <tr class="hover:bg-gray-50 transition border-t border-gray-50">
+                    <td class="p-4"><input type="checkbox" class="rowCheckbox w-4 h-4 accent-blue-500" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
+                    <td class="p-4 font-medium text-gray-700"><%= m.nomi %></td>
+                    <td class="p-4 text-gray-500"><%= m.narxi %></td>
+                    <td class="p-4 text-gray-500"><%= m.soni %></td>
                 </tr>
                 <% }) %>
             </tbody>
@@ -44,33 +54,30 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-    // Qidiruv funksiyasi
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const val = this.value.toLowerCase();
-        document.querySelectorAll('#mevaTable tbody tr').forEach(row => {
+    // Qidiruv
+    document.getElementById('searchInput').addEventListener('keyup', e => {
+        const val = e.target.value.toLowerCase();
+        document.querySelectorAll('tbody tr').forEach(row => {
             row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
         });
     });
 
-    // Tanlanganlar summasini hisoblash
-    const checkboxes = document.querySelectorAll('.rowCheckbox');
-    const totalSum = document.getElementById('totalSum');
-    
-    checkboxes.forEach(cb => {
+    // Summa
+    document.querySelectorAll('.rowCheckbox').forEach(cb => {
         cb.addEventListener('change', () => {
-            let sum = 0;
+            let total = 0;
             document.querySelectorAll('.rowCheckbox:checked').forEach(c => {
-                sum += (c.dataset.price * c.dataset.count);
+                total += (parseFloat(c.dataset.price) * parseFloat(c.dataset.count));
             });
-            totalSum.innerText = sum.toLocaleString();
+            document.getElementById('totalSum').innerText = total.toLocaleString() + " so'm";
         });
     });
 
-    // Excelga eksport
     function exportToExcel() {
         const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
-        XLSX.writeFile(wb, "Ombor_Hisoboti.xlsx");
+        XLSX.writeFile(wb, "Report.xlsx");
     }
 </script>
 </body>
