@@ -6,12 +6,12 @@
     <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f1f5f9; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; }
-        .chart-container { height: 300px; }
+        body { font-family: sans-serif; background: #f1f5f9; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 800px; width: 100%; background: white; padding: 20px; border-radius: 12px; }
+        .chart-container { height: 250px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
-        #totalDisplay { font-size: 24px; font-weight: bold; color: #10b981; margin-top: 20px; text-align: right; }
+        td, th { padding: 12px; border-bottom: 1px solid #eee; }
+        #totalDisplay { font-size: 22px; font-weight: 800; color: #10b981; margin-top: 15px; text-align: right; }
     </style>
 </head>
 <body>
@@ -25,15 +25,18 @@
 
     <table>
         <thead>
-            <tr><th>Meva</th><th>Soni</th><th>Narxi</th><th>Jami</th></tr>
+            <tr><th>Tanlash</th><th>Meva</th><th>Soni</th><th>Narxi</th></tr>
         </thead>
         <tbody>
             <% mevalar.forEach((meva) => { %>
                 <tr class="meva-row">
+                    <td><input type="radio" name="selectMeva" class="radio-select" 
+                               data-price="<%= meva.narxi %>" 
+                               data-count="<%= meva.soni %>" 
+                               onchange="calculateTotal()"></td>
                     <td><%= meva.nomi %></td>
                     <td class="soni"><%= meva.soni %></td>
                     <td class="narxi"><%= meva.narxi %></td>
-                    <td><%= (meva.soni * meva.narxi).toLocaleString() %> so'm</td>
                 </tr>
             <% }) %>
         </tbody>
@@ -41,35 +44,36 @@
 </div>
 
 <script>
-    // 1. Chart uchun ma'lumotlarni xatosiz olish
-    const labels = [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>];
-    const data = [<% mevalar.forEach(m => { %> <%= m.soni %>, <% }) %>];
-
-    // 2. Chartni ishga tushirish
+    // 1. CHARTNI ASL HOLIDA (LEGENDSIZ) ISHLATISH
     const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, {
+    const myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: labels,
+            labels: [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>],
             datasets: [{
-                data: data,
+                data: [<% mevalar.forEach(m => { %> <%= m.soni %>, <% }) %>],
                 backgroundColor: ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff']
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false } // TEPA QISM O'CHIRILDI
+            }
         }
     });
 
-    // 3. TOTAL SUMMANI HISOBLASH (undefined bo'lmasligi uchun)
+    // 2. RADIO BUTTON ORQALI HISOBLASH
     function calculateTotal() {
-        let total = 0;
-        document.querySelectorAll('.meva-row').forEach(row => {
-            let soni = parseFloat(row.querySelector('.soni').innerText) || 0;
-            let narxi = parseFloat(row.querySelector('.narxi').innerText) || 0;
-            total += (soni * narxi);
-        });
-        document.getElementById('totalDisplay').innerText = "Jami: " + total.toLocaleString() + " so'm";
+        const selected = document.querySelector('.radio-select:checked');
+        if (selected) {
+            const price = parseFloat(selected.dataset.price) || 0;
+            const count = parseFloat(selected.dataset.count) || 0;
+            const total = price * count;
+            document.getElementById('totalDisplay').innerText = "Tanlangan jami: " + total.toLocaleString() + " so'm";
+        }
     }
-
-    calculateTotal();
 </script>
 
 </body>
