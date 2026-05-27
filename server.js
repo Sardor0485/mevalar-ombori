@@ -7,8 +7,9 @@ const TelegramBot = require('node-telegram-bot-api');
 const app = express();
 const PORT = process.env.PORT || 10000;
 const TOKEN = '7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0';
-const bot = new TelegramBot(TOKEN);
 
+// Webhook orqali bot (409 Conflict yechimi)
+const bot = new TelegramBot(TOKEN);
 bot.setWebHook(`https://mevalar-ombori.onrender.com/bot${TOKEN}`);
 
 app.use(express.urlencoded({ extended: true }));
@@ -19,11 +20,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-function checkAuth(req, res, next) {
-    if (req.signedCookies && req.signedCookies.isLoggedIn === 'true') return next();
-    res.redirect('/login');
-}
+// Middleware
+const checkAuth = (req, res, next) => (req.signedCookies?.isLoggedIn === 'true') ? next() : res.redirect('/login');
 
+// CRUD API
 app.get('/', checkAuth, async (req, res) => {
     const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC;');
     res.render('index', { mevalar: result.rows });
@@ -45,20 +45,28 @@ app.get('/meva/ochirish/:id', checkAuth, async (req, res) => {
     res.redirect('/');
 });
 
-app.get('/login', (req, res) => res.send(`<h2>Kirish</h2><form method="POST"><input name="username" placeholder="Login"><input type="password" name="password" placeholder="Parol"><button>Kirish</button></form>`));
+// Telegram Webhook route
+app.post(`/bot${TOKEN}`, (req, res) => { bot.processUpdate(req.body); res.sendStatus(200); });
+
+// Telegram Bot CRUD
+bot.onText(/\/qoshish (.+) (.+) (.+)/, async (msg, match) => {
+    await pool.query('INSERT INTO mevalar (nomi, soni, narxi) VALUES ($1, $2, $3)', [match, match, match]);
+    bot.sendMessage(msg.chat.id, "✅ Meva qo'shildi!");
+});
+
+bot.onText(/\/status/, async (msg) => {
+    const res = await pool.query('SELECT * FROM mevalar');
+    let text = "📦 *Ombor:\n" + res.rows.map(m => `ID:${m.id} | ${m.nomi}: ${m.soni} ta`).join('\n');
+    bot.sendMessage(msg.chat.id, text, { parse_mode: 'Markdown' });
+});
+
+// Login
+app.get('/login', (req, res) => res.send(`<h2>Login</h2><form method="POST"><input name="username"><input type="password" name="password"><button>Kirish</button></form>`));
 app.post('/login', (req, res) => {
     if (req.body.username === 'admin' && req.body.password === '12345') {
         res.cookie('isLoggedIn', 'true', { signed: true, maxAge: 86400000, httpOnly: true });
         res.redirect('/');
-    } else res.send("Parol xato! <a href='/login'>Qaytish</a>");
+    } else res.send("Xato!");
 });
 
-app.post(`/bot${TOKEN}`, (req, res) => { bot.processUpdate(req.body); res.sendStatus(200); });
-
-bot.onText(/\/status/, async (msg) => {
-    const res = await pool.query('SELECT nomi, soni FROM mevalar');
-    let text = "📦 *Ombor holati:*\n" + res.rows.map(m => `• ${m.nomi}: ${m.soni} ta`).join('\n');
-    bot.sendMessage(msg.chat.id, text, { parse_mode: 'Markdown' });
-});
-
-app.listen(PORT, () => console.log(`🚀 Server ${PORT}-portda!`));
+app.listen(PORT, () => console.log(`Server running`));
