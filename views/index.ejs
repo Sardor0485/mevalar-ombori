@@ -7,87 +7,60 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: sans-serif; }
-        .chart-container { width: 150px; height: 150px; margin: auto; }
-        .card { border-radius: 15px; }
-        .table-responsive { border-radius: 10px; overflow: hidden; }
-        .excel-input { width: 70px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 5px; }
-        .btn-action { padding: 5px 12px; font-size: 0.85rem; }
+        .excel-input { width: 80px; text-align: center; border: 1px solid #ced4da; border-radius: 4px; padding: 5px; }
     </style>
 </head>
-<body class="p-3">
+<body class="bg-light p-3">
 
-    <div class="container-fluid" style="max-width: 600px;">
-        <div class="card shadow-sm mb-4 p-3">
-            <div class="chart-container">
-                <canvas id="myChart"></canvas>
-            </div>
-        </div>
-
-        <div class="table-responsive shadow-sm bg-white">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Nomi</th>
-                        <th>Soni</th>
-                        <th>Narxi</th>
-                        <th>Amal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% mevalar.forEach((m) => { %>
-                    <tr>
-                        <td class="fw-bold"><%= m.nomi %></td>
-                        <td><input type="number" value="<%= m.soni %>" id="soni-<%= m.id %>" class="excel-input"></td>
-                        <td><input type="number" value="<%= m.narxi %>" id="narxi-<%= m.id %>" class="excel-input"></td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <button onclick="save('<%= m.id %>')" class="btn btn-primary btn-action">Edit</button>
-                                <a href="/meva/ochirish/<%= m.id %>" class="btn btn-danger btn-action">Del</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+<div class="container" style="max-width: 600px;">
+    <h3 class="text-center mb-4">🍎 Ombor Ombori</h3>
+    
+    <div class="card shadow-sm mb-4 p-3">
+        <canvas id="myChart" style="max-height: 250px;"></canvas>
     </div>
 
+    <div class="table-responsive bg-white p-2 rounded shadow-sm">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr><th>Nomi</th><th>Soni</th><th>Narxi</th><th>Amal</th></tr>
+            </thead>
+            <tbody>
+                <% mevalar.forEach((m) => { %>
+                <tr>
+                    <td class="fw-bold"><%= m.nomi %></td>
+                    <td><input type="number" value="<%= m.soni %>" id="soni-<%= m.id %>" class="excel-input"></td>
+                    <td><input type="number" value="<%= m.narxi %>" id="narxi-<%= m.id %>" class="excel-input"></td>
+                    <td>
+                        <button onclick="save('<%= m.id %>')" class="btn btn-primary btn-sm">Saqlash</button>
+                        <a href="/meva/ochirish/<%= m.id %>" class="btn btn-danger btn-sm">O'chirish</a>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
-    // Chart.js konfiguratsiyasi
-    const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, { 
+    // Grafik
+    const labels = <%- JSON.stringify(mevalar.map(m => m.nomi)) %>;
+    const values = <%- JSON.stringify(mevalar.map(m => m.soni)) %>;
+    new Chart(document.getElementById('myChart'), { 
         type: 'doughnut', 
-        data: { 
-            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>, 
-            datasets: [{ 
-                data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, 
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'] 
-            }] 
-        },
-        options: { 
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false } // Label'larni o'chirish
-            }
-        }
+        data: { labels, datasets: [{ data: values, backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'] }] }
     });
 
-    // Tahrirlash funksiyasi
+    // Saqlash funksiyasi
     function save(id) {
         const soni = document.getElementById('soni-'+id).value;
         const narxi = document.getElementById('narxi-'+id).value;
-        
         fetch('/meva/tahrirlash/'+id, { 
             method: 'POST', 
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify({ soni, narxi }) 
         })
         .then(res => res.json())
-        .then(data => {
-            if(data.success) location.reload();
-        });
+        .then(data => { if(data.success) location.reload(); });
     }
 </script>
 </body>
