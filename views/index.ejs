@@ -3,66 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meva Dashboard</title>
+    <title>Ombor Boshqaruvi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
-        .hover-card:hover { transform: translateY(-5px); transition: 0.3s; }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-4 md:p-10">
+<body class="bg-gray-100 p-4 md:p-8">
 
-    <div class="max-w-5xl mx-auto">
-        <h1 class="text-4xl font-black text-white mb-8 text-center drop-shadow-lg">🍎 Meva Ombori Pro</h1>
+<div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+    <h1 class="text-2xl font-bold mb-6">📦 Ombor Boshqaruvi</h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <form action="/meva/qoshish" method="POST" class="glass p-6 rounded-3xl shadow-2xl">
-                <h2 class="text-xl font-bold mb-4 text-gray-700">➕ Yangi mahsulot</h2>
-                <input type="text" name="nomi" placeholder="Nomi" class="w-full p-3 mb-3 border-2 rounded-xl focus:border-purple-500 outline-none transition" required>
-                <div class="flex gap-2">
-                    <input type="number" name="narxi" placeholder="Narxi" class="w-full p-3 border-2 rounded-xl outline-none" required>
-                    <input type="number" name="soni" placeholder="Soni" class="w-full p-3 border-2 rounded-xl outline-none" required>
-                </div>
-                <button class="w-full mt-4 bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 active:scale-95 transition">Saqlash</button>
-            </form>
-
-            <div class="glass p-6 rounded-3xl shadow-2xl">
-                <canvas id="mevaChart"></canvas>
-            </div>
-        </div>
-
-        <div class="glass p-6 rounded-3xl shadow-2xl mt-8 overflow-hidden">
-            <table class="w-full text-left">
-                <thead><tr class="text-gray-400 uppercase text-sm"><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th></tr></thead>
-                <tbody>
-                    <% mevalar.forEach(m => { %>
-                    <tr class="border-t hover:bg-purple-50 transition cursor-pointer hover-card">
-                        <td class="p-4 font-bold text-gray-800"><%= m.nomi %></td>
-                        <td class="p-4 text-green-600 font-mono"><%= m.narxi %> so'm</td>
-                        <td class="p-4 text-purple-600 font-bold"><%= m.soni %> dona</td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+    <div class="flex flex-wrap gap-4 mb-6">
+        <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="border p-2 rounded-lg flex-1">
+        <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Excel Export</button>
+        <div class="bg-purple-100 px-4 py-2 rounded-lg font-bold">Jami: <span id="totalSum">0</span> so'm</div>
     </div>
 
-    <script>
-        // Chart.js uchun ma'lumotlar
-        const ctx = document.getElementById('mevaChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
-                datasets: [{
-                    label: 'Meva Soni',
-                    data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>,
-                    backgroundColor: '#8b5cf6'
-                }]
-            },
-            options: { responsive: true, animation: { duration: 2000 } }
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse" id="mevaTable">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-3"><input type="checkbox" id="selectAll"></th>
+                    <th class="p-3">Nomi</th>
+                    <th class="p-3">Narxi</th>
+                    <th class="p-3">Soni</th>
+                    <th class="p-3">Jami</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% mevalar.forEach(m => { %>
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 text-center"><input type="checkbox" class="rowCheckbox" data-price="<%= m.narxi %>" data-count="<%= m.soni %>"></td>
+                    <td class="p-3"><%= m.nomi %></td>
+                    <td class="p-3"><%= m.narxi %></td>
+                    <td class="p-3"><%= m.soni %></td>
+                    <td class="p-3"><%= m.narxi * m.soni %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Qidiruv funksiyasi
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const val = this.value.toLowerCase();
+        document.querySelectorAll('#mevaTable tbody tr').forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
         });
-    </script>
+    });
+
+    // Tanlanganlar summasini hisoblash
+    const checkboxes = document.querySelectorAll('.rowCheckbox');
+    const totalSum = document.getElementById('totalSum');
+    
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            let sum = 0;
+            document.querySelectorAll('.rowCheckbox:checked').forEach(c => {
+                sum += (c.dataset.price * c.dataset.count);
+            });
+            totalSum.innerText = sum.toLocaleString();
+        });
+    });
+
+    // Excelga eksport
+    function exportToExcel() {
+        const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
+        XLSX.writeFile(wb, "Ombor_Hisoboti.xlsx");
+    }
+</script>
 </body>
 </html>
