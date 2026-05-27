@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Ombor Pro</title>
+    <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -21,21 +21,21 @@
 
         .container { width: 100%; max-width: 850px; }
 
-        /* TEPADAGI NAV */
+        /* TEPADAGI NAV (Yozuvsiz, faqat tugmalar uchun) */
         .top-nav {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 10px;
+            gap: 10px;
         }
-        .logo { font-size: 16px; font-weight: 800; color: #10b981; }
         
         .btn-main {
-            background: #10b981; color: white; border: none; padding: 5px 12px;
-            border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 12px;
+            background: #10b981; color: white; border: none; padding: 6px 14px;
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
         }
 
-        /* 4 BAROVAR KICHRAYTIRILGAN MINI PANEL */
+        /* 1 BAROBAR KATTALASHTIRILGAN STATISTIKA PANELI */
         .mini-stat-bar {
             display: flex;
             align-items: center;
@@ -43,18 +43,18 @@
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 4px 12px;
+            padding: 6px 14px;
             margin-bottom: 10px;
-            height: 38px; /* O'ta ixcham balandlik */
+            height: 56px; /* Grafik kattalashgani uchun balandlik moslandi */
             box-sizing: border-box;
         }
 
-        .stat-left { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #475569; }
-        .chart-micro-box { width: 22px; height: 22px; display: flex; align-items: center; } /* Micro Grafik */
+        .stat-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #475569; }
+        .chart-micro-box { width: 44px; height: 44px; display: flex; align-items: center; } /* Chart 1 barobar kattalashtirildi */
 
-        .total-right { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .total-right { display: flex; align-items: center; gap: 6px; font-size: 13px; }
         .total-label { color: #64748b; font-weight: 500; }
-        .total-value { font-weight: 700; color: #10b981; }
+        .total-value { font-weight: 700; color: #10b981; font-size: 14px; }
 
         /* POISK (QIDIRUV) */
         .search-row { margin-bottom: 10px; position: relative; }
@@ -66,13 +66,26 @@
         .search-input:focus { border-color: #10b981; }
         .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 13px; }
 
-        /* JADVAL */
-        .table-card {
-            background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;
+        /* MOBILDA GORIZONTAL SKROL BO'LISHI UCHUN ENG ASOSIY QISM */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto; /* Gorizontal skrolni yoqadi */
+            -webkit-overflow-scrolling: touch; /* iOS va Androidda silliq surilish */
+            background: #fff; 
+            border-radius: 8px; 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
         }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 13px; 
+            min-width: 550px; /* Mobil ekranda jadval qisqarib ketmasligi uchun minimal kenglik */
+        }
+        
         th { background: #f8fafc; padding: 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         
         /* RAMKASIZ INPUTLAR */
@@ -83,21 +96,21 @@
         }
         .borderless-input:focus { border-color: #10b981; background: #f0fdf4; }
 
-        .check-custom { width: 15px; height: 15px; accent-color: #10b981; cursor: pointer; }
+        .check-custom { width: 16px; height: 16px; accent-color: #10b981; cursor: pointer; }
 
         /* AMALLAR (EDIT & DEL) */
         .actions-group { display: flex; gap: 5px; justify-content: flex-end; }
         
         .btn-action-save {
             background: #e6f4ea; color: #137333; border: none; 
-            padding: 4px 8px; border-radius: 4px; font-size: 11px; 
+            padding: 5px 9px; border-radius: 4px; font-size: 11px; 
             font-weight: 600; cursor: pointer;
         }
         .btn-action-save:hover { background: #137333; color: white; }
 
         .btn-action-del {
             background: #fce8e6; color: #c5221f; border: none; 
-            padding: 4px 8px; border-radius: 4px; font-size: 11px; 
+            padding: 5px 9px; border-radius: 4px; font-size: 11px; 
             font-weight: 600; cursor: pointer; text-decoration: none;
         }
         .btn-action-del:hover { background: #c5221f; color: white; }
@@ -110,11 +123,8 @@
 <div class="container">
     
     <div class="top-nav">
-        <div class="logo">FRUIT OMBOR</div>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
-            <a href="/logout" style="font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; align-self: center; padding: 2px 5px;">Chiqish</a>
-        </div>
+        <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
+        <a href="/logout" style="font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; padding: 4px 8px; border: 1px solid #fca5a5; border-radius: 5px;">Chiqish</a>
     </div>
 
     <div class="mini-stat-bar">
@@ -145,7 +155,7 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Meva nomini yozib qidiring..." oninput="liveSearch()">
     </div>
 
-    <div class="table-card">
+    <div class="table-wrapper">
         <table id="mevaTable">
             <thead>
                 <tr>
@@ -213,7 +223,7 @@
         document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
     }
 
-    // MICRO DONUT CHART SCRIPT
+    // 1 BAROBAR KATTALASHTIRILGAN CHART SCRIPT
     const ctx = document.getElementById('miniChart').getContext('2d');
     const labels = [];
     const data = [];
@@ -229,15 +239,15 @@
             datasets: [{
                 data: data,
                 backgroundColor: ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#9b5de5', '#f15bb5', '#10b981'],
-                borderWidth: 1,
+                borderWidth: 1.5,
                 borderColor: '#ffffff'
             }]
         },
         options: {
-            cutout: '70%',
+            cutout: '65%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } } // Ortiqcha tooltip o'chirildi
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
         }
     });
 </script>
