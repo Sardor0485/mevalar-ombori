@@ -21,7 +21,7 @@
 
         .container { width: 100%; max-width: 850px; }
 
-        /* TEPADAGI NAV (Yozuvsiz, faqat tugmalar uchun) */
+        /* TEPADAGI NAV */
         .top-nav {
             display: flex;
             justify-content: flex-end;
@@ -31,11 +31,12 @@
         }
         
         .btn-main {
-            background: #10b981; color: white; border: none; padding: 6px 14px;
+            background: #0f766e; color: white; border: none; padding: 6px 14px;
             border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
         }
+        .btn-main:hover { background: #115e59; }
 
-        /* 1 BAROBAR KATTALASHTIRILGAN STATISTIKA PANELI */
+        /* SOKIN VA PROFESSIONAL STATISTIKA PANELI */
         .mini-stat-bar {
             display: flex;
             align-items: center;
@@ -45,16 +46,16 @@
             border-radius: 8px;
             padding: 6px 14px;
             margin-bottom: 10px;
-            height: 56px; /* Grafik kattalashgani uchun balandlik moslandi */
+            height: 56px;
             box-sizing: border-box;
         }
 
         .stat-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #475569; }
-        .chart-micro-box { width: 44px; height: 44px; display: flex; align-items: center; } /* Chart 1 barobar kattalashtirildi */
+        .chart-micro-box { width: 44px; height: 44px; display: flex; align-items: center; position: relative; }
 
         .total-right { display: flex; align-items: center; gap: 6px; font-size: 13px; }
         .total-label { color: #64748b; font-weight: 500; }
-        .total-value { font-weight: 700; color: #10b981; font-size: 14px; }
+        .total-value { font-weight: 700; color: #0f766e; font-size: 14px; }
 
         /* POISK (QIDIRUV) */
         .search-row { margin-bottom: 10px; position: relative; }
@@ -63,25 +64,25 @@
             border: 1px solid #cbd5e1; background: #ffffff; font-size: 13px; outline: none;
             box-sizing: border-box;
         }
-        .search-input:focus { border-color: #10b981; }
+        .search-input:focus { border-color: #0f766e; }
         .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 13px; }
 
-        /* MOBILDA GORIZONTAL SKROL BO'LISHI UCHUN ENG ASOSIY QISM */
+        /* GORIZONTAL SCROLL JADVALI */
         .table-wrapper {
             width: 100%;
-            overflow-x: auto; /* Gorizontal skrolni yoqadi */
-            -webkit-overflow-scrolling: touch; /* iOS va Androidda silliq surilish */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             background: #fff; 
             border-radius: 8px; 
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
         }
 
         table { 
             width: 100%; 
             border-collapse: collapse; 
             font-size: 13px; 
-            min-width: 550px; /* Mobil ekranda jadval qisqarib ketmasligi uchun minimal kenglik */
+            min-width: 550px;
         }
         
         th { background: #f8fafc; padding: 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
@@ -94,26 +95,26 @@
             padding: 4px; font-size: 13px; width: 60px; outline: none;
             border-radius: 4px; font-weight: 500;
         }
-        .borderless-input:focus { border-color: #10b981; background: #f0fdf4; }
+        .borderless-input:focus { border-color: #0f766e; background: #f0fdf4; }
 
-        .check-custom { width: 16px; height: 16px; accent-color: #10b981; cursor: pointer; }
+        .check-custom { width: 16px; height: 16px; accent-color: #0f766e; cursor: pointer; }
 
         /* AMALLAR (EDIT & DEL) */
         .actions-group { display: flex; gap: 5px; justify-content: flex-end; }
         
         .btn-action-save {
-            background: #e6f4ea; color: #137333; border: none; 
+            background: #f0fdf4; color: #115e59; border: none; 
             padding: 5px 9px; border-radius: 4px; font-size: 11px; 
             font-weight: 600; cursor: pointer;
         }
-        .btn-action-save:hover { background: #137333; color: white; }
+        .btn-action-save:hover { background: #0f766e; color: white; }
 
         .btn-action-del {
-            background: #fce8e6; color: #c5221f; border: none; 
+            background: #fef2f2; color: #991b1b; border: none; 
             padding: 5px 9px; border-radius: 4px; font-size: 11px; 
             font-weight: 600; cursor: pointer; text-decoration: none;
         }
-        .btn-action-del:hover { background: #c5221f; color: white; }
+        .btn-action-del:hover { background: #991b1b; color: white; }
 
         #addForm { display: none; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
     </style>
@@ -124,7 +125,7 @@
     
     <div class="top-nav">
         <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
-        <a href="/logout" style="font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; padding: 4px 8px; border: 1px solid #fca5a5; border-radius: 5px;">Chiqish</a>
+        <a href="/logout" style="font-size: 12px; color: #991b1b; text-decoration: none; font-weight: 600; padding: 4px 8px; border: 1px solid #fca5a5; border-radius: 5px; background: #fff;">Chiqish</a>
     </div>
 
     <div class="mini-stat-bar">
@@ -132,7 +133,7 @@
             <div class="chart-micro-box">
                 <canvas id="miniChart"></canvas>
             </div>
-            <span>Ombor zaxirasi</span>
+            <span>Zaxira ulushi</span>
         </div>
         
         <div class="total-right">
@@ -223,7 +224,7 @@
         document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
     }
 
-    // 1 BAROBAR KATTALASHTIRILGAN CHART SCRIPT
+    // INTERAKTIV VA JIDDIY KLASSIK INTERFEYS RANGLARI
     const ctx = document.getElementById('miniChart').getContext('2d');
     const labels = [];
     const data = [];
@@ -238,16 +239,36 @@
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#9b5de5', '#f15bb5', '#10b981'],
+                // Premium pastel Corporate ranglar (neonlar butunlay olib tashlandi)
+                backgroundColor: ['#475569', '#0f766e', '#0284c7', '#4f46e5', '#b45309', '#65a30d', '#db2777'],
                 borderWidth: 1.5,
-                borderColor: '#ffffff'
+                borderColor: '#ffffff',
+                hoverOffset: 3
             }]
         },
         options: {
             cutout: '65%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            animation: { duration: 600 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#1e293b',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '500' },
+                    padding: 8,
+                    cornerRadius: 6,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' ta';
+                        }
+                    }
+                }
+            }
         }
     });
 </script>
