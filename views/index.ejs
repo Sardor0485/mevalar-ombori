@@ -3,40 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meva Ombori</title>
+    <title>Pro Ombor CRUD</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 p-6">
-
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800">🍎 Ombor Boshqaruvi</h1>
-
-        <form action="/meva/qoshish" method="POST" class="bg-white p-6 rounded-xl shadow-sm mb-6 flex gap-4">
-            <input type="text" name="nomi" placeholder="Nomi" class="border p-2 rounded w-full" required>
-            <input type="number" name="narxi" placeholder="Narxi" class="border p-2 rounded w-32" required>
-            <input type="number" name="soni" placeholder="Soni" class="border p-2 rounded w-32" required>
-            <button class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Qo'shish</button>
+<body class="bg-slate-50 p-6">
+    <div class="max-w-5xl mx-auto">
+        <form action="/meva/qoshish" method="POST" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+            <input type="text" name="nomi" placeholder="Meva nomi" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
+            <input type="number" name="narxi" placeholder="Narxi" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
+            <input type="number" name="soni" placeholder="Soni" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
+            <button class="bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold">➕ Qo'shish</button>
         </form>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-4">Nomi</th>
-                        <th class="p-4">Narxi</th>
-                        <th class="p-4">Soni</th>
-                        <th class="p-4">Amallar</th>
-                    </tr>
+        <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-500 uppercase">
+                    <tr><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Jami</th><th class="p-4">Amallar</th></tr>
                 </thead>
-                <tbody>
+                <tbody id="mevaBody">
                     <% mevalar.forEach(m => { %>
-                    <tr class="border-b">
-                        <td class="p-4"><%= m.nomi %></td>
+                    <tr class="border-t <%= m.soni < 5 ? 'bg-red-50' : '' %>">
+                        <td class="p-4 font-bold"><%= m.nomi %></td>
                         <td class="p-4"><%= m.narxi %></td>
                         <td class="p-4"><%= m.soni %></td>
-                        <td class="p-4 flex gap-2">
-                            <button onclick="editMeva('<%= m.id %>')" class="text-blue-600 underline">Edit</button>
-                            <a href="/meva/ochirish/<%= m.id %>" class="text-red-600 underline">Delete</a>
+                        <td class="p-4 font-mono font-bold text-indigo-600"><%= m.narxi * m.soni %></td>
+                        <td class="p-4 flex gap-3">
+                            <button onclick="editItem('<%= m.id %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500 hover:underline">Edit</button>
+                            <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('O\'chirilsinmi?')" class="text-red-500 hover:underline">Del</a>
                         </td>
                     </tr>
                     <% }) %>
@@ -46,15 +39,14 @@
     </div>
 
     <script>
-        // Tahrirlash funksiyasi (Prompt orqali)
-        function editMeva(id) {
-            const soni = prompt("Yangi sonini kiriting:");
-            const narxi = prompt("Yangi narxini kiriting:");
-            if (soni && narxi) {
+        function editItem(id, soni, narxi) {
+            const newSoni = prompt("Yangi sonini kiriting:", soni);
+            const newNarxi = prompt("Yangi narxini kiriting:", narxi);
+            if (newSoni && newNarxi) {
                 fetch(`/meva/tahrirlash/${id}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ soni, narxi })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({soni: newSoni, narxi: newNarxi})
                 }).then(() => location.reload());
             }
         }
