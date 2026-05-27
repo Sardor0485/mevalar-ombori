@@ -5,49 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ombor Boshqaruvi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Font Awesome ikonkalari uchun -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .table-container { overflow-x: auto; }
-        input:focus { outline: 2px solid #4f46e5; }
+        body { font-family: sans-serif; background: #f8fafc; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
     </style>
 </head>
-<body class="bg-slate-50 p-6">
+<body class="p-4 md:p-8">
 
-<div class="max-w-6xl mx-auto">
-    <!-- Header va Toolbar -->
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h1 class="text-2xl font-bold text-slate-800">📦 Ombor Paneli</h1>
-        <div class="flex gap-2">
-            <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg w-full md:w-64">
-            <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
-                <i class="fa-solid fa-file-excel"></i> Excel
-            </button>
-        </div>
+<div class="max-w-5xl mx-auto">
+    <div class="card p-4 mb-6 shadow-sm" style="height: 159px;">
+        <canvas id="mevaChart"></canvas>
     </div>
 
-    <!-- Jadval -->
-    <div class="bg-white rounded-xl shadow border p-4 table-container">
+    <div class="flex gap-2 mb-4">
+        <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg flex-1">
+        <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="fa-solid fa-file-excel"></i></button>
+    </div>
+
+    <div class="card shadow-sm overflow-x-auto">
         <table class="w-full text-left" id="mevaTable">
             <thead>
-                <tr class="border-b text-slate-400 uppercase text-xs">
-                    <th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Amallar</th>
+                <tr class="text-gray-400 text-xs uppercase border-b">
+                    <th class="p-3">Nomi</th><th class="p-3">Narxi</th><th class="p-3">Soni</th><th class="p-3">Amallar</th>
                 </tr>
             </thead>
             <tbody>
                 <% mevalar.forEach(m => { %>
-                <tr class="border-b hover:bg-slate-50">
-                    <td class="p-4 font-bold text-lg"><%= m.nomi %></td>
-                    <td class="p-4 text-lg"><%= m.narxi %></td>
-                    <td class="p-4 text-lg"><%= m.soni %></td>
-                    <td class="p-4 flex gap-4 text-xl">
-                        <button onclick="editItem('<%= m.id %>', '<%= m.nomi %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500 hover:text-blue-700">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('Haqiqatan ham o\'chirmoqchimisiz?')" class="text-red-500 hover:text-red-700">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
+                <tr class="border-b hover:bg-gray-50 text-sm">
+                    <td class="p-3 font-semibold"><%= m.nomi %></td>
+                    <td class="p-3"><%= m.narxi %></td>
+                    <td class="p-3"><%= m.soni %></td>
+                    <td class="p-3 flex gap-4 text-lg">
+                        <button onclick="editItem('<%= m.id %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>
+                        <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('O\'chirilsinmi?')" class="text-red-500"><i class="fa-solid fa-trash"></i></a>
                     </td>
                 </tr>
                 <% }) %>
@@ -57,7 +50,17 @@
 </div>
 
 <script>
-    // Qidiruv
+    // Chart.js (159px balandlikka moslangan)
+    new Chart(document.getElementById('mevaChart'), {
+        type: 'bar',
+        data: {
+            labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
+            datasets: [{ label: 'Soni', data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, backgroundColor: '#6366f1' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    // Qidiruv va Edit funksiyalari
     document.getElementById('searchInput').addEventListener('keyup', e => {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('tbody tr').forEach(row => {
@@ -65,27 +68,21 @@
         });
     });
 
-    // Edit funksiyasi (Alert bilan)
-    function editItem(id, nomi, soni, narxi) {
-        const newSoni = prompt(`"${nomi}" uchun yangi sonni kiriting:`, soni);
-        const newNarxi = prompt(`"${nomi}" uchun yangi narxni kiriting:`, narxi);
-        
+    function editItem(id, soni, narxi) {
+        const newSoni = prompt("Yangi soni:", soni);
+        const newNarxi = prompt("Yangi narxi:", narxi);
         if (newSoni !== null && newNarxi !== null) {
             fetch(`/meva/tahrirlash/${id}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({soni: newSoni, narxi: newNarxi})
-            }).then(() => {
-                alert("Muvaffaqiyatli yangilandi!");
-                location.reload();
-            }).catch(() => alert("Xatolik yuz berdi!"));
+            }).then(() => { alert("Yangilandi!"); location.reload(); });
         }
     }
 
-    // Excel Export
     function exportToExcel() {
         const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
-        XLSX.writeFile(wb, "Ombor_Royxati.xlsx");
+        XLSX.writeFile(wb, "Ombor.xlsx");
     }
 </script>
 </body>
