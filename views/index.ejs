@@ -336,9 +336,9 @@
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
                     <% mevalar.forEach((meva) => { %>
-                        <tr class="table-row">
+                        <tr class="meva-row">
                             <td style="color: #6b7280; text-align: center; font-weight: 500;">#<%= meva.id %></td>
-                            <td class="meva-name-cell" style="font-weight: 500; color: #111827;"><%= meva.nomi %></td>
+                            <td class="meva-name" style="font-weight: 500; color: #111827;"><%= meva.nomi %></td>
                             
                             <td>
                                 <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
@@ -383,25 +383,25 @@
         form.classList.toggle('show');
     }
 
-    // HAQIQIY JONLI (LIVE) QIDIRUV SCRIPT-I
+    // YANGI TUZATILGAN JONLI QIDIRUV SCRIPT-I
     function liveSearch() {
-        const input = document.getElementById('searchInput');
-        const filter = input.value.toLowerCase();
-        const table = document.getElementById('mevaTable');
-        const rows = table.getElementsByClassName('table-row');
+        const searchInput = document.getElementById('searchInput');
+        const filter = searchInput.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.meva-row');
 
-        for (let i = 0; i < rows.length; i++) {
-            const nameCell = rows[i].getElementsByClassName('meva-name-cell');
-            if (nameCell) {
-                const txtValue = nameCell.textContent || nameCell.innerText;
-                // Harf yozilishi bilan silliq tekshiradi
-                if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                    rows[i].style.display = "";
+        rows.forEach(row => {
+            const nameElement = row.querySelector('.meva-name');
+            if (nameElement) {
+                const nameText = nameElement.textContent || nameElement.innerText;
+                
+                // Agar qidiruv so'zi nom ichida bo'lsa, qatorni ko'rsat, bo'lmasa yashir
+                if (nameText.toLowerCase().includes(filter)) {
+                    row.style.display = ""; // Standart ko'rinish
                 } else {
-                    rows[i].style.display = "none";
+                    row.style.display = "none"; // Yashirish
                 }
             }
-        }
+        });
     }
 </script>
 
