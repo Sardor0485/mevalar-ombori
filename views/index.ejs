@@ -3,53 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Ombor CRUD</title>
+    <title>Ombor Boshqaruvi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Font Awesome ikonkalari uchun -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .table-container { overflow-x: auto; }
+        input:focus { outline: 2px solid #4f46e5; }
+    </style>
 </head>
 <body class="bg-slate-50 p-6">
-    <div class="max-w-5xl mx-auto">
-        <form action="/meva/qoshish" method="POST" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-            <input type="text" name="nomi" placeholder="Meva nomi" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
-            <input type="number" name="narxi" placeholder="Narxi" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
-            <input type="number" name="soni" placeholder="Soni" class="p-3 rounded-lg border focus:ring-2 outline-none" required>
-            <button class="bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold">➕ Qo'shish</button>
-        </form>
 
-        <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-slate-50 text-slate-500 uppercase">
-                    <tr><th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Jami</th><th class="p-4">Amallar</th></tr>
-                </thead>
-                <tbody id="mevaBody">
-                    <% mevalar.forEach(m => { %>
-                    <tr class="border-t <%= m.soni < 5 ? 'bg-red-50' : '' %>">
-                        <td class="p-4 font-bold"><%= m.nomi %></td>
-                        <td class="p-4"><%= m.narxi %></td>
-                        <td class="p-4"><%= m.soni %></td>
-                        <td class="p-4 font-mono font-bold text-indigo-600"><%= m.narxi * m.soni %></td>
-                        <td class="p-4 flex gap-3">
-                            <button onclick="editItem('<%= m.id %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500 hover:underline">Edit</button>
-                            <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('O\'chirilsinmi?')" class="text-red-500 hover:underline">Del</a>
-                        </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+<div class="max-w-6xl mx-auto">
+    <!-- Header va Toolbar -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h1 class="text-2xl font-bold text-slate-800">📦 Ombor Paneli</h1>
+        <div class="flex gap-2">
+            <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg w-full md:w-64">
+            <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </button>
         </div>
     </div>
 
-    <script>
-        function editItem(id, soni, narxi) {
-            const newSoni = prompt("Yangi sonini kiriting:", soni);
-            const newNarxi = prompt("Yangi narxini kiriting:", narxi);
-            if (newSoni && newNarxi) {
-                fetch(`/meva/tahrirlash/${id}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({soni: newSoni, narxi: newNarxi})
-                }).then(() => location.reload());
-            }
+    <!-- Jadval -->
+    <div class="bg-white rounded-xl shadow border p-4 table-container">
+        <table class="w-full text-left" id="mevaTable">
+            <thead>
+                <tr class="border-b text-slate-400 uppercase text-xs">
+                    <th class="p-4">Nomi</th><th class="p-4">Narxi</th><th class="p-4">Soni</th><th class="p-4">Amallar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% mevalar.forEach(m => { %>
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-4 font-bold text-lg"><%= m.nomi %></td>
+                    <td class="p-4 text-lg"><%= m.narxi %></td>
+                    <td class="p-4 text-lg"><%= m.soni %></td>
+                    <td class="p-4 flex gap-4 text-xl">
+                        <button onclick="editItem('<%= m.id %>', '<%= m.nomi %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500 hover:text-blue-700">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('Haqiqatan ham o\'chirmoqchimisiz?')" class="text-red-500 hover:text-red-700">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Qidiruv
+    document.getElementById('searchInput').addEventListener('keyup', e => {
+        const val = e.target.value.toLowerCase();
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+        });
+    });
+
+    // Edit funksiyasi (Alert bilan)
+    function editItem(id, nomi, soni, narxi) {
+        const newSoni = prompt(`"${nomi}" uchun yangi sonni kiriting:`, soni);
+        const newNarxi = prompt(`"${nomi}" uchun yangi narxni kiriting:`, narxi);
+        
+        if (newSoni !== null && newNarxi !== null) {
+            fetch(`/meva/tahrirlash/${id}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({soni: newSoni, narxi: newNarxi})
+            }).then(() => {
+                alert("Muvaffaqiyatli yangilandi!");
+                location.reload();
+            }).catch(() => alert("Xatolik yuz berdi!"));
         }
-    </script>
+    }
+
+    // Excel Export
+    function exportToExcel() {
+        const wb = XLSX.utils.table_to_book(document.getElementById('mevaTable'));
+        XLSX.writeFile(wb, "Ombor_Royxati.xlsx");
+    }
+</script>
 </body>
 </html>
