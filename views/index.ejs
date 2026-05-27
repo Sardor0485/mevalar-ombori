@@ -3,25 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meva Ombori — Excel Pro Dashboard</title>
+    <title>Mevalar Ombori</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        :root {
-            --excel-green: #107c41; /* Haqiqiy Excel yashil rangi */
-            --excel-green-hover: #0e6836;
-            --excel-light-green: #e1f1e9;
-            --bg: #f3f4f6;
-            --border-color: #d1d5db;
-            --text-color: #1f2937;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-color);
+            background-color: #f9fafb;
+            color: #1f2937;
             margin: 0;
-            padding: 30px 15px;
+            padding: 20px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,158 +20,143 @@
 
         .container {
             width: 100%;
-            max-width: 950px;
+            max-width: 800px;
         }
 
-        /* Yuqori Panel */
+        /* Ixcham Tepadagi Panel */
         .toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-radius: 8px 8px 0 0;
-            border: 1px solid var(--border-color);
+            border: 1px solid #d1d5db;
             border-bottom: none;
         }
 
         .logo-area {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--excel-green);
+            color: #107c41;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .actions-area {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* Forma ochish plyus tugmasi */
+        /* Plyus tugmasi */
         .btn-toggle-form {
-            background: var(--excel-green);
+            background: #107c41;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: background 0.2s;
+            gap: 4px;
         }
 
         .btn-toggle-form:hover {
-            background: var(--excel-green-hover);
+            background: #0e6836;
         }
 
         .btn-logout {
             background: white;
-            color: #6b7280;
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            padding: 6px 12px;
             border-radius: 4px;
             text-decoration: none;
             font-size: 13px;
             font-weight: 500;
-            transition: all 0.2s;
         }
 
         .btn-logout:hover {
-            background: #fee2e2;
+            background: #fef2f2;
             color: #dc2626;
             border-color: #fca5a5;
         }
 
-        /* Yashirin Excel Stilidagi Forma */
+        /* Silliq ochiluvchi forma */
         .form-container {
             background: #f9fafb;
-            border: 1px solid var(--border-color);
-            padding: 0px 20px;
-            max-height: 0; /* Dastlab yopiq */
+            border: 1px solid #d1d5db;
+            padding: 0px 16px;
+            max-height: 0;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             opacity: 0;
-            box-sizing: border-box;
         }
 
         .form-container.show {
-            padding: 20px;
-            max-height: 150px; /* Ochilganda balandligi */
+            padding: 16px;
+            max-height: 180px;
             opacity: 1;
             border-bottom: none;
         }
 
         .excel-form {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
         }
 
         .excel-form input {
-            border: 1px solid var(--border-color);
+            border: 1px solid #d1d5db;
             padding: 8px 12px;
-            font-size: 14px;
+            font-size: 13px;
             border-radius: 4px;
             outline: none;
             background: white;
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
         }
 
         .excel-form input:focus {
-            border-color: var(--excel-green);
-            box-shadow: 0 0 0 2px var(--excel-light-green);
+            border-color: #107c41;
         }
 
         .btn-save-new {
-            background: var(--excel-green);
+            background: #107c41;
             color: white;
             border: none;
-            padding: 9px 20px;
+            padding: 8px 16px;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
         }
 
-        /* Excel Jadval ko'rinishi */
-        .excel-table-wrapper {
+        /* Ixcham Chiziqli Jadval */
+        .table-wrapper {
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid #d1d5db;
             border-radius: 0 0 8px 8px;
             overflow-x: auto;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        /* Excel uslubidagi ustun harflari (A, B, C...) */
-        .excel-grid-header th {
-            background: #e2e8f0;
-            color: #4b5563;
-            font-size: 11px;
-            font-weight: 500;
-            text-align: center;
-            padding: 4px;
-            border: 1px solid var(--border-color);
+            font-size: 13px;
+            min-width: 500px; /* Telefonda siqilib ketmasligi uchun majburiy kenglik */
         }
 
         th {
             background: #f3f4f6;
             color: #374151;
             font-weight: 600;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
             text-align: left;
         }
 
@@ -190,82 +166,77 @@
             vertical-align: middle;
         }
 
-        /* Excel uslubidagi indeks qatori (1, 2, 3...) */
-        .row-index {
-            background: #f3f4f6;
-            color: #6b7280;
-            font-size: 11px;
-            text-align: center;
-            font-weight: 500;
-            width: 40px;
-            user-select: none;
-            border-right: 1px solid var(--border-color);
-        }
-
         tr:hover td {
             background-color: #f9fafb;
         }
 
-        /* Excel katak ichidagi inputlar (Haqiqiy tahrirlash effekti) */
-        .cell-form {
+        /* Tahrirlash qatori elementlari */
+        .edit-form {
             display: flex;
             align-items: center;
-            gap: 5px;
-            width: 100%;
+            gap: 4px;
+            margin: 0;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            background: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        .input-box:focus-within {
+            border-color: #107c41;
+            background: white;
         }
 
         .cell-input {
-            border: 1px solid transparent; /* Input sezilmay turadi */
+            border: none;
             background: transparent;
-            padding: 6px 8px;
-            font-size: 14px;
-            width: 100%;
-            max-width: 110px;
-            border-radius: 4px;
+            padding: 4px;
+            font-size: 13px;
+            width: 55px;
+            outline: none;
             font-family: inherit;
             color: inherit;
-            transition: all 0.15s;
         }
 
-        /* Katakka bosilganda xuddi Exceldek yashil chiziq bo'ladi */
-        .cell-input:focus {
-            border-color: var(--excel-green);
-            background: white;
-            outline: none;
-            box-shadow: 0 0 0 2px var(--excel-light-green);
+        .unit {
+            font-size: 11px;
+            color: #9ca3af;
+            padding-right: 2px;
         }
 
+        /* Qalamcha (Edit) tugmasi */
         .btn-cell-submit {
-            background: none;
-            border: 1px solid #cbd5e0;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
             color: #4b5563;
-            padding: 4px 8px;
+            padding: 5px 8px;
             border-radius: 4px;
-            font-size: 12px;
             cursor: pointer;
-            visibility: hidden; /* Faqat tahrirlaganda chiqadi */
-            opacity: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
         }
 
-        /* Input fokus bo'lganda yonidagi Saqlash tugmasi ko'rinadi */
-        .cell-input:focus + .btn-cell-submit,
         .btn-cell-submit:hover {
-            visibility: visible;
-            opacity: 1;
-            background: var(--excel-light-green);
-            border-color: var(--excel-green);
-            color: var(--excel-green);
+            background: #e1f1e9;
+            border-color: #107c41;
+            color: #107c41;
         }
 
-        /* Savatcha (Trash) Ikona dizayni */
+        /* Savatcha (Trash) tugmasi */
         .btn-trash {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
             background: transparent;
             color: #9ca3af;
             border: none;
@@ -281,8 +252,7 @@
         .no-data {
             text-align: center;
             color: #9ca3af;
-            padding: 30px !important;
-            font-style: italic;
+            padding: 20px !important;
         }
     </style>
 </head>
@@ -291,13 +261,10 @@
 <div class="container">
     
     <div class="toolbar">
-        <div class="logo-area">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-            Meva_Ombori.xlsx
-        </div>
+        <div class="logo-area">🍏 Mevalar Ombori</div>
         <div class="actions-area">
             <button class="btn-toggle-form" onclick="toggleForm()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                 Yangi meva
             </button>
             <a href="/logout" class="btn-logout">Chiqish</a>
@@ -313,54 +280,44 @@
         </form>
     </div>
 
-    <div class="excel-table-wrapper">
+    <div class="table-wrapper">
         <table>
             <thead>
-                <tr class="excel-grid-header">
-                    <th style="width: 40px;"></th>
-                    <th style="width: 80px;">A</th>
-                    <th>B</th>
-                    <th>C</th>
-                    <th>D</th>
-                    <th style="width: 60px; text-align: center;">E</th>
-                </tr>
                 <tr>
-                    <th></th>
-                    <th>ID</th>
-                    <th>Mahsulot Nomi</th>
-                    <th>Zaxira miqdori</th>
-                    <th>Narxi (So'm)</th>
-                    <th style="text-align: center;">O'chirish</th>
+                    <th style="width: 50px; text-align: center;">ID</th>
+                    <th style="width: 140px;">Mahsulot Nomi</th>
+                    <th>Miqdori va Narxi (O'zgartirish)</th>
+                    <th style="width: 70px; text-align: center;">O'chirish</th>
                 </tr>
             </thead>
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
-                    <% mevalar.forEach((meva, index) => { %>
+                    <% mevalar.forEach((meva) => { %>
                         <tr>
-                            <td class="row-index"><%= index + 1 %></td>
-                            <td style="color: #6b7280; font-weight: 500;">#<%= meva.id %></td>
+                            <td style="color: #6b7280; text-align: center; font-weight: 500;">#<%= meva.id %></td>
                             <td style="font-weight: 500; color: #111827;">🍏 <%= meva.nomi %></td>
                             
-                            <td colspan="2" style="padding: 0;">
-                                <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="cell-form" style="display: table; width: 100%;">
-                                    <div style="display: table-cell; width: 50%; padding: 6px 12px; border-right: 1px solid #e5e7eb;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                                            <input type="number" name="soni" class="cell-input" value="<%= meva.soni %>" required>
-                                            <button type="submit" class="btn-cell-submit">Saqlash</button>
-                                        </div>
+                            <td>
+                                <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
+                                    <div class="input-box">
+                                        <input type="number" name="soni" class="cell-input" value="<%= meva.soni %>" required>
+                                        <span class="unit">ta</span>
                                     </div>
-                                    <div style="display: table-cell; width: 50%; padding: 6px 12px;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                                            <input type="number" name="narxi" class="cell-input" value="<%= meva.narxi %>" required>
-                                            <button type="submit" class="btn-cell-submit">Saqlash</button>
-                                        </div>
+                                    <div class="input-box">
+                                        <input type="number" name="narxi" class="cell-input" style="width: 75px;" value="<%= meva.narxi %>" required>
+                                        <span class="unit">so'm</span>
                                     </div>
+                                    <button type="submit" class="btn-cell-submit" title="Saqlash">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                        </svg>
+                                    </button>
                                 </form>
                             </td>
 
                             <td style="text-align: center;">
-                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-trash" title="O'chirish" onclick="return confirm('Ushbu mevani ombordan o\'chirishni xohlaysizmi?')">
-                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <a href="/meva/ochirish/<%= meva.id %>" class="btn-trash" title="O'chirish" onclick="return confirm('O\'chirilsinmi?')">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
                                 </a>
@@ -369,8 +326,7 @@
                     <% }) %>
                 <% } else { %>
                     <tr>
-                        <td class="row-index">1</td>
-                        <td colspan="5" class="no-data">Ombor bo'sh. Jadvalda ma'lumot yo'q.</td>
+                        <td colspan="4" class="no-data">Ombor bo'sh. Mahsulot kiritilmagan.</td>
                     </tr>
                 <% } %>
             </tbody>
@@ -379,7 +335,6 @@
 </div>
 
 <script>
-    // Formani silliq ochish va yopish funksiyasi
     function toggleForm() {
         const form = document.getElementById('newMevaForm');
         form.classList.toggle('show');
