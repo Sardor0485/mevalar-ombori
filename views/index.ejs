@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mevalar Ombori</title>
+    <title>Mevalar Ombori — Admin Panel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -23,69 +23,34 @@
             max-width: 800px;
         }
 
-        /* Ixcham Tepadagi Panel */
-        .toolbar {
+        /* TEPADAGI ASOSIY ADMIN PANEL */
+        .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            padding: 12px 16px;
+            background: #ffffff;
+            padding: 14px 16px;
             border-radius: 8px 8px 0 0;
             border: 1px solid #d1d5db;
             border-bottom: none;
-            gap: 10px;
-            flex-wrap: wrap;
         }
 
-        .logo-area {
+        .logo-title {
             font-size: 16px;
             font-weight: 700;
             color: #107c41;
         }
 
-        /* Qidiruv va Amallar qismi */
-        .actions-area {
+        .header-buttons {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        /* Jonli Qidiruv Inputi */
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input {
-            border: 1px solid #d1d5db;
-            padding: 6px 10px 6px 30px;
-            font-size: 13px;
-            border-radius: 4px;
-            outline: none;
-            width: 160px;
-            transition: all 0.2s;
-        }
-
-        .search-input:focus {
-            border-color: #107c41;
-            width: 200px; /* Fokus bo'lganda chiroyli kengayadi */
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 10px;
-            color: #9ca3af;
-            pointer-events: none;
-        }
-
-        /* Plyus tugmasi */
         .btn-toggle-form {
             background: #107c41;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 7px 14px;
             border-radius: 4px;
             font-size: 13px;
             font-weight: 600;
@@ -103,7 +68,7 @@
             background: white;
             color: #4b5563;
             border: 1px solid #d1d5db;
-            padding: 6px 12px;
+            padding: 7px 14px;
             border-radius: 4px;
             text-decoration: none;
             font-size: 13px;
@@ -114,6 +79,47 @@
             background: #fef2f2;
             color: #dc2626;
             border-color: #fca5a5;
+        }
+
+        /* JONLI QIDIRUV PANEL-I */
+        .search-bar-container {
+            background: #f3f4f6;
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-input {
+            border: 1px solid #cbd5e0;
+            padding: 8px 12px 8px 34px;
+            font-size: 13px;
+            border-radius: 4px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #107c41;
+            box-shadow: 0 0 0 2px rgba(16, 124, 65, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #9ca3af;
+            pointer-events: none;
         }
 
         /* Silliq ochiluvchi forma */
@@ -201,7 +207,7 @@
             background-color: #f9fafb;
         }
 
-        /* Tahrirlash qatori elementlari */
+        /* Tahrirlash inputlari */
         .edit-form {
             display: flex;
             align-items: center;
@@ -250,7 +256,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
 
         .btn-cell-submit:hover {
@@ -289,21 +294,23 @@
 
 <div class="container">
     
-    <div class="toolbar">
-        <div class="logo-area">Ombor hisoboti</div>
-        <div class="actions-area">
-            <div class="search-box">
-                <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input type="text" id="searchInput" class="search-input" placeholder="Qidirish..." onkeyup="liveSearch()">
-            </div>
-            
+    <div class="admin-header">
+        <div class="logo-title">Admin Panel — Ombor hisoboti</div>
+        <div class="header-buttons">
             <button class="btn-toggle-form" onclick="toggleForm()">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                 Yangi meva
             </button>
             <a href="/logout" class="btn-logout">Chiqish</a>
+        </div>
+    </div>
+
+    <div class="search-bar-container">
+        <div class="search-box">
+            <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Ombordan qidirish..." oninput="liveSearch()">
         </div>
     </div>
 
@@ -361,7 +368,7 @@
                         </tr>
                     <% }) %>
                 <% } else { %>
-                    <tr id="noDataRow">
+                    <tr>
                         <td colspan="4" class="no-data">Ombor bo'sh. Mahsulot kiritilmagan.</td>
                     </tr>
                 <% } %>
@@ -376,7 +383,7 @@
         form.classList.toggle('show');
     }
 
-    // ULTRA TEZKOR JONLI QIDIRUV SCRIPT-I
+    // HAQIQIY JONLI (LIVE) QIDIRUV SCRIPT-I
     function liveSearch() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
@@ -387,6 +394,7 @@
             const nameCell = rows[i].getElementsByClassName('meva-name-cell');
             if (nameCell) {
                 const txtValue = nameCell.textContent || nameCell.innerText;
+                // Harf yozilishi bilan silliq tekshiradi
                 if (txtValue.toLowerCase().indexOf(filter) > -1) {
                     rows[i].style.display = "";
                 } else {
