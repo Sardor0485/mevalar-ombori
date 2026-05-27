@@ -6,47 +6,76 @@
     <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f1f5f9; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 800px; width: 100%; background: white; padding: 20px; border-radius: 12px; }
-        .chart-container { height: 250px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 20px; font-size: 18px; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        .chart-container { height: 150px; margin-bottom: 20px; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        td, th { padding: 12px; border-bottom: 1px solid #eee; }
+        th, td { padding: 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        
+        .btn-main { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        .btn-action { background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px; }
+        
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 18px; }
         #totalDisplay { font-size: 22px; font-weight: 800; color: #10b981; margin-top: 15px; text-align: right; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="chart-container">
-        <canvas id="myChart"></canvas>
+    <div class="card">
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div id="totalDisplay">Tanlangan jami: 0 so'm</div>
     </div>
-    
-    <div id="totalDisplay">Jami: 0 so'm</div>
 
-    <table>
-        <thead>
-            <tr><th>Tanlash</th><th>Meva</th><th>Soni</th><th>Narxi</th></tr>
-        </thead>
-        <tbody>
-            <% mevalar.forEach((meva) => { %>
-                <tr class="meva-row">
-                    <td><input type="radio" name="selectMeva" class="radio-select" 
-                               data-price="<%= meva.narxi %>" 
-                               data-count="<%= meva.soni %>" 
-                               onchange="calculateTotal()"></td>
-                    <td><%= meva.nomi %></td>
-                    <td class="soni"><%= meva.soni %></td>
-                    <td class="narxi"><%= meva.narxi %></td>
-                </tr>
-            <% }) %>
-        </tbody>
-    </table>
+    <div class="card">
+        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" name="nomi" placeholder="Meva nomi" required>
+            <input type="number" name="soni" placeholder="Soni" required>
+            <input type="number" name="narxi" placeholder="Narxi" required>
+            <button type="submit" class="btn-main">+ Qo'shish</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr><th>Tanlash</th><th>Meva</th><th>Soni</th><th>Narxi</th><th>Amallar</th></tr>
+            </thead>
+            <tbody>
+                <% mevalar.forEach((meva) => { %>
+                    <tr>
+                        <td>
+                            <input type="radio" name="selectMeva" class="radio-select" 
+                                   data-price="<%= meva.narxi %>" data-count="<%= meva.soni %>" 
+                                   onchange="calculateTotal()" style="transform: scale(1.5);">
+                        </td>
+                        <td><%= meva.nomi %></td>
+                        <td>
+                            <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" style="display: flex; gap: 5px;">
+                                <input type="number" name="soni" value="<%= meva.soni %>" style="width: 80px;">
+                                <button type="submit" class="btn-action">📝</button>
+                            </form>
+                        </td>
+                        <td><%= meva.narxi %></td>
+                        <td>
+                            <a href="/meva/ochirish/<%= meva.id %>" class="btn-action" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    // 1. CHARTNI ASL HOLIDA (LEGENDSIZ) ISHLATISH
+    // Chart
     const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: [<% mevalar.forEach(m => { %> '<%= m.nomi %>', <% }) %>],
@@ -55,22 +84,14 @@
                 backgroundColor: ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff']
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false } // TEPA QISM O'CHIRILDI
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. RADIO BUTTON ORQALI HISOBLASH
+    // Summa
     function calculateTotal() {
         const selected = document.querySelector('.radio-select:checked');
         if (selected) {
-            const price = parseFloat(selected.dataset.price) || 0;
-            const count = parseFloat(selected.dataset.count) || 0;
-            const total = price * count;
+            const total = parseFloat(selected.dataset.price) * parseFloat(selected.dataset.count);
             document.getElementById('totalDisplay').innerText = "Tanlangan jami: " + total.toLocaleString() + " so'm";
         }
     }
