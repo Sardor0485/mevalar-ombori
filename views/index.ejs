@@ -2,20 +2,21 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ombor Boshqaruvi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 p-6">
+<body class="bg-slate-50 p-4 md:p-6">
 <div class="max-w-5xl mx-auto">
     <div class="bg-white p-4 mb-6 rounded-xl shadow-sm border" style="height: 159px;">
         <canvas id="mevaChart"></canvas>
     </div>
 
     <div class="flex gap-2 mb-4 items-center">
-        <button onclick="document.getElementById('addForm').classList.toggle('hidden')" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700"><i class="fa-solid fa-plus"></i></button>
+        <button onclick="document.getElementById('addForm').classList.toggle('hidden')" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 shadow-lg"><i class="fa-solid fa-plus"></i></button>
         <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg flex-1">
         <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="fa-solid fa-file-excel"></i></button>
     </div>

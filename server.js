@@ -4,7 +4,7 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
-const TOKEN = '7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0';
+const TOKEN = '7860298112:AAFB6YQxlFKIZsW5GUL8fVOEALNjH7cJ5Ac';
 const ADMIN_ID = '8009669458';
 
 const pool = new Pool({ 
@@ -12,16 +12,18 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false } 
 });
 
-const bot = new TelegramBot(TOKEN, { polling: !process.env.PORT });
+const bot = new TelegramBot(TOKEN, { polling: true });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
-// --- WEB ---
+// --- WEB YO'LLARI ---
 app.get('/', async (req, res) => {
-    const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC');
-    res.render('index', { mevalar: result.rows });
+    try {
+        const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC');
+        res.render('index', { mevalar: result.rows });
+    } catch (err) { res.send(err.message); }
 });
 
 app.post('/meva/qoshish', async (req, res) => {
@@ -46,10 +48,8 @@ bot.on('message', async (msg) => {
     const chatId = msg.chat.id.toString();
     if (chatId !== ADMIN_ID) return;
 
-    if (msg.text === '/start') {
-        return bot.sendMessage(chatId, "🍎 Ombor boshqaruvi ishga tushdi!");
-    }
-
+    if (msg.text === '/start') return bot.sendMessage(chatId, "🍎 Ombor boshqaruvi ishga tushdi!");
+    
     const p = msg.text.split(' ');
     if (p.length === 3) {
         await pool.query('INSERT INTO mevalar (nomi, narxi, soni) VALUES ($1, $2, $3)', [p, parseInt(p), parseInt(p)]);
