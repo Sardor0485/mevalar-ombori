@@ -33,20 +33,51 @@
             border-radius: 8px 8px 0 0;
             border: 1px solid #d1d5db;
             border-bottom: none;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .logo-area {
             font-size: 16px;
             font-weight: 700;
             color: #107c41;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
+        /* Qidiruv va Amallar qismi */
         .actions-area {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Jonli Qidiruv Inputi */
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            border: 1px solid #d1d5db;
+            padding: 6px 10px 6px 30px;
+            font-size: 13px;
+            border-radius: 4px;
+            outline: none;
+            width: 160px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #107c41;
+            width: 200px; /* Fokus bo'lganda chiroyli kengayadi */
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            color: #9ca3af;
+            pointer-events: none;
         }
 
         /* Plyus tugmasi */
@@ -59,7 +90,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 4px;
         }
@@ -148,7 +179,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
-            min-width: 500px; /* Telefonda siqilib ketmasligi uchun majburiy kenglik */
+            min-width: 500px;
         }
 
         th {
@@ -209,7 +240,6 @@
             padding-right: 2px;
         }
 
-        /* Qalamcha (Edit) tugmasi */
         .btn-cell-submit {
             background: #f3f4f6;
             border: 1px solid #d1d5db;
@@ -229,7 +259,6 @@
             color: #107c41;
         }
 
-        /* Savatcha (Trash) tugmasi */
         .btn-trash {
             display: inline-flex;
             align-items: center;
@@ -261,8 +290,15 @@
 <div class="container">
     
     <div class="toolbar">
-        <div class="logo-area">🍏 Mevalar Ombori</div>
+        <div class="logo-area">Ombor hisoboti</div>
         <div class="actions-area">
+            <div class="search-box">
+                <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Qidirish..." onkeyup="liveSearch()">
+            </div>
+            
             <button class="btn-toggle-form" onclick="toggleForm()">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                 Yangi meva
@@ -281,7 +317,7 @@
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <table id="mevaTable">
             <thead>
                 <tr>
                     <th style="width: 50px; text-align: center;">ID</th>
@@ -293,9 +329,9 @@
             <tbody>
                 <% if (mevalar && mevalar.length > 0) { %>
                     <% mevalar.forEach((meva) => { %>
-                        <tr>
+                        <tr class="table-row">
                             <td style="color: #6b7280; text-align: center; font-weight: 500;">#<%= meva.id %></td>
-                            <td style="font-weight: 500; color: #111827;">🍏 <%= meva.nomi %></td>
+                            <td class="meva-name-cell" style="font-weight: 500; color: #111827;"><%= meva.nomi %></td>
                             
                             <td>
                                 <form action="/meva/tahrirlash/<%= meva.id %>" method="POST" class="edit-form">
@@ -325,7 +361,7 @@
                         </tr>
                     <% }) %>
                 <% } else { %>
-                    <tr>
+                    <tr id="noDataRow">
                         <td colspan="4" class="no-data">Ombor bo'sh. Mahsulot kiritilmagan.</td>
                     </tr>
                 <% } %>
@@ -338,6 +374,26 @@
     function toggleForm() {
         const form = document.getElementById('newMevaForm');
         form.classList.toggle('show');
+    }
+
+    // ULTRA TEZKOR JONLI QIDIRUV SCRIPT-I
+    function liveSearch() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('mevaTable');
+        const rows = table.getElementsByClassName('table-row');
+
+        for (let i = 0; i < rows.length; i++) {
+            const nameCell = rows[i].getElementsByClassName('meva-name-cell');
+            if (nameCell) {
+                const txtValue = nameCell.textContent || nameCell.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
     }
 </script>
 
