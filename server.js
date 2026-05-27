@@ -18,7 +18,7 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 30 } // 30 daqiqa davomida faol
 }));
 
-// EJS shablonizatorini aynan sizning 'views' papkangizga moslash
+// EJS shablonizatorini sozlash
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -104,22 +104,61 @@ app.get('/meva/ochirish/:id', checkAuth, async (req, res) => {
     }
 });
 
-// LOGIN / LOGOUT
+// 📌 LOGIN FORMALARI UCHUN HTML SHABLON FUNKSIYASI (Faylsiz to'g'ridan-to'g'ri ishlashi uchun)
+function getLoginHTML(errorMsg = null) {
+    return `
+    <!DOCTYPE html>
+    <html lang="uz">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tizimga Kirish</title>
+        <style>
+            body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+            .login-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 320px; }
+            h2 { text-align: center; color: #333; margin-bottom: 20px; }
+            label { font-size: 14px; color: #555; display: block; margin-top: 10px; }
+            input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+            input:focus { border-color: #4CAF50; outline: none; }
+            .error-msg { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 12px; font-weight: bold; }
+            button { width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; font-weight: bold; }
+            button:hover { background-color: #45a049; }
+        </style>
+    </head>
+    <body>
+    <div class="login-container">
+        <h2>🔑 Tizimga Kirish</h2>
+        <form action="/login" method="POST">
+            <label>Foydalanuvchi nomi:</label>
+            <input type="text" name="username" placeholder="admin" required>
+            <label>Parol:</label>
+            <input type="password" name="password" placeholder="12345" required>
+            ${errorMsg ? `<div class="error-msg">${errorMsg}</div>` : ''}
+            <button type="submit">Kirish</button>
+        </form>
+    </div>
+    </body>
+    </html>`;
+}
+
+// LOGIN - GET (Faylsiz HTML qaytaradi)
 app.get('/login', (req, res) => {
-    if (req.session.isLoggedIn) return res.redirect('/');
-    res.render('login', { error: null });
+    if (req.session && req.session.isLoggedIn) return res.redirect('/');
+    res.send(getLoginHTML());
 });
 
+// LOGIN - POST
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     if (username === 'admin' && password === '12345') {
         req.session.isLoggedIn = true;
         res.redirect('/');
     } else {
-        res.render('login', { error: "Foydalanuvchi nomi yoki parol noto'g'ri!" });
+        res.send(getLoginHTML("Foydalanuvchi nomi yoki parol noto'g'ri!"));
     }
 });
 
+// LOGOUT
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/login');
