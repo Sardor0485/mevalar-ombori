@@ -20,7 +20,7 @@ app.use(session({
     secret: 'maxfiy-kalit-soz', 
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 6000 } // 10 daqiqa faol bo'lmasa, avtomatik chiqib ketadi
+    cookie: { maxAge: 600000 } // 10 daqiqa faol bo'lmasa, avtomatik chiqib ketadi
 }));
 
 // 🔐 HIMOYACHI (Middleware): Ismlar mosligi to'g'rilandi
