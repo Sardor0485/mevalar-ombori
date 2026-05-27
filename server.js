@@ -8,7 +8,7 @@ const TOKEN = '7860298112:AAHI6cB8Jve9Vqez4ShdGhxlY7dNWK3gpm0';
 const ADMIN_ID = '8009669458';
 
 const pool = new Pool({ 
-    connectionString: 'postgres://default:o4W5fHlRjQ0G@ep-winter-water-a4178x6k.us-east-1.aws.neon.tech/verceldb?sslmode=require', 
+    connectionString: 'postgresql://sardor:fz63vfBSYn1hZx4iFOSJm2Z1z5k0g8lh@dpg-d8bcefb7uimc73ar2c8g-a/meva_baza', 
     ssl: { rejectUnauthorized: false } 
 });
 
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
-// --- WEB YO'LLARI ---
+// --- WEB ---
 app.get('/', async (req, res) => {
     const result = await pool.query('SELECT * FROM mevalar ORDER BY id ASC');
     res.render('index', { mevalar: result.rows });
@@ -41,18 +41,18 @@ app.get('/meva/ochirish/:id', async (req, res) => {
     res.redirect('/');
 });
 
-// --- BOT LOGIKASI ---
+// --- BOT ---
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id.toString();
     if (chatId !== ADMIN_ID) return;
 
     if (msg.text === '/start') {
-        return bot.sendMessage(chatId, "🍎 Salom Admin! Ombor tayyor.\nFormat: Nomi Narxi Soni");
+        return bot.sendMessage(chatId, "🍎 Ombor boshqaruvi ishga tushdi!");
     }
 
     const p = msg.text.split(' ');
     if (p.length === 3) {
-        await pool.query('INSERT INTO mevalar (nomi, narxi, soni) VALUES ($1, $2, $3)', [p[0], parseInt(p[1]), parseInt(p[2])]);
+        await pool.query('INSERT INTO mevalar (nomi, narxi, soni) VALUES ($1, $2, $3)', [p, parseInt(p), parseInt(p)]);
         bot.sendMessage(chatId, "✅ Saqlandi!");
     } else {
         const res = await pool.query('SELECT * FROM mevalar WHERE nomi ILIKE $1', [`%${msg.text}%`]);
