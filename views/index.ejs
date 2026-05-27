@@ -6,117 +6,163 @@
     <title>Ombor Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
+            background-color: #f1f5f9;
+            color: #0f172a;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .container { width: 100%; max-width: 850px; }
+        .container { width: 100%; max-width: 900px; }
 
-        /* TEPADAGI NAV */
+        /* NAV BAR */
         .top-nav {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: 10px;
-            gap: 10px;
+            margin-bottom: 8px;
+            gap: 8px;
         }
         
         .btn-main {
-            background: #0f766e; color: white; border: none; padding: 6px 14px;
-            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
+            background: #10b981; color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 15px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
-        .btn-main:hover { background: #115e59; }
+        .btn-main:hover { background: #059669; }
 
-        /* SOKIN VA PROFESSIONAL STATISTIKA PANELI */
-        .mini-stat-bar {
+        /* ANALITIKA BLOKI (RASMDAGIDEK KENG) */
+        .analytics-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* CUSTOM LEGEND (TEPADAGI RO'YXAT) */
+        .custom-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .legend-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* CHART VISUAL ROW */
+        .chart-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 15px;
+            position: relative;
+        }
+        .chart-container-box {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        /* CHART TASHQARISIDAGI JONLI YAZUV OYNASI */
+        .chart-info-display {
+            background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 6px 14px;
-            margin-bottom: 10px;
-            height: 56px;
-            box-sizing: border-box;
+            padding: 10px 14px;
+            min-width: 160px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
+        .info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+        .info-value { font-size: 14px; font-weight: 700; color: #10b981; }
 
-        .stat-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #475569; }
-        .chart-micro-box { width: 44px; height: 44px; display: flex; align-items: center; position: relative; }
-
-        .total-right { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .total-label { color: #64748b; font-weight: 500; }
-        .total-value { font-weight: 700; color: #0f766e; font-size: 14px; }
+        /* TOTAL REKORD BLOCK */
+        .total-box {
+            text-align: right;
+        }
+        .total-label { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+        .total-value { font-size: 20px; font-weight: 800; color: #10b981; }
 
         /* POISK (QIDIRUV) */
-        .search-row { margin-bottom: 10px; position: relative; }
+        .search-row { margin-bottom: 8px; position: relative; }
         .search-input {
-            width: 100%; padding: 8px 12px 8px 34px; border-radius: 6px;
-            border: 1px solid #cbd5e1; background: #ffffff; font-size: 13px; outline: none;
-            box-sizing: border-box;
+            width: 100%; padding: 12px 15px 12px 42px; border-radius: 8px;
+            border: 1px solid #cbd5e1; background: #ffffff; font-size: 15px; outline: none;
+            box-sizing: border-box; font-weight: 700; color: #334155;
         }
-        .search-input:focus { border-color: #0f766e; }
-        .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 13px; }
+        .search-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
+        .search-icon { position: absolute; left: 14px; top: 12px; color: #94a3b8; font-size: 16px; }
 
-        /* GORIZONTAL SCROLL JADVALI */
+        /* MAKSIMAL ZICH VA YIRIK JADVAL */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             background: #fff; 
-            border-radius: 8px; 
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
+            border-radius: 12px; 
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 13px; 
-            min-width: 550px;
+            font-size: 17px; /* Shriftlar ancha yiriklashtirildi */
+            min-width: 600px;
         }
         
-        th { background: #f8fafc; padding: 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        th { background: #f8fafc; padding: 12px 14px; text-align: left; color: #475569; font-weight: 800; font-size: 16px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         
-        /* RAMKASIZ INPUTLAR */
+        /* INPUTLAR (ZICH VA QALIN MATNLI) */
         .borderless-input {
             border: 1px solid transparent; background: transparent;
-            padding: 4px; font-size: 13px; width: 60px; outline: none;
-            border-radius: 4px; font-weight: 500;
+            padding: 4px 6px; font-size: 17px; width: 85px; outline: none;
+            border-radius: 6px; font-weight: 700; color: #0f172a;
         }
-        .borderless-input:focus { border-color: #0f766e; background: #f0fdf4; }
+        .borderless-input:focus { border-color: #10b981; background: #f0fdf4; }
 
-        .check-custom { width: 16px; height: 16px; accent-color: #0f766e; cursor: pointer; }
+        .check-custom { width: 22px; height: 22px; accent-color: #10b981; cursor: pointer; }
 
-        /* AMALLAR (EDIT & DEL) */
-        .actions-group { display: flex; gap: 5px; justify-content: flex-end; }
+        /* YORQIN SMAYLIK AMAL TUGMALARI */
+        .actions-group { display: flex; gap: 8px; justify-content: flex-end; }
         
-        .btn-action-save {
-            background: #f0fdf4; color: #115e59; border: none; 
-            padding: 5px 9px; border-radius: 4px; font-size: 11px; 
-            font-weight: 600; cursor: pointer;
+        .btn-emoji-edit {
+            background: #e6f4ea; border: none; font-size: 20px;
+            padding: 6px 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
-        .btn-action-save:hover { background: #0f766e; color: white; }
+        .btn-emoji-edit:hover { background: #10b981; transform: scale(1.1); }
 
-        .btn-action-del {
-            background: #fef2f2; color: #991b1b; border: none; 
-            padding: 5px 9px; border-radius: 4px; font-size: 11px; 
-            font-weight: 600; cursor: pointer; text-decoration: none;
+        .btn-emoji-del {
+            background: #fce8e6; border: none; font-size: 20px;
+            padding: 6px 10px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.2s;
         }
-        .btn-action-del:hover { background: #991b1b; color: white; }
+        .btn-emoji-del:hover { background: #ef4444; transform: scale(1.1); }
 
-        #addForm { display: none; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+        #addForm { display: none; padding: 14px; background: #fff; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -125,28 +171,34 @@
     
     <div class="top-nav">
         <button class="btn-main" onclick="toggleForm()">+ Qo'shish</button>
-        <a href="/logout" style="font-size: 12px; color: #991b1b; text-decoration: none; font-weight: 600; padding: 4px 8px; border: 1px solid #fca5a5; border-radius: 5px; background: #fff;">Chiqish</a>
+        <a href="/logout" style="font-size: 14px; color: #ef4444; text-decoration: none; font-weight: 800; padding: 8px 14px; border: 1px solid #fca5a5; border-radius: 8px; background: #fff;">Chiqish</a>
     </div>
 
-    <div class="mini-stat-bar">
-        <div class="stat-left">
-            <div class="chart-micro-box">
+    <div class="analytics-card">
+        <div class="custom-legend" id="chartLegend"></div>
+
+        <div class="chart-row">
+            <div class="chart-container-box">
                 <canvas id="miniChart"></canvas>
             </div>
-            <span>Zaxira ulushi</span>
-        </div>
-        
-        <div class="total-right">
-            <span class="total-label">Tanlangan jami:</span>
-            <span class="total-value" id="totalDisplay">0 so'm</span>
+            
+            <div class="chart-info-display">
+                <div class="info-title" id="infoFruitName">Meva tanlang</div>
+                <div class="info-value" id="infoFruitCount">Ustiga bosing...</div>
+            </div>
+
+            <div class="total-box">
+                <div class="total-label">Tanlangan jami</div>
+                <div class="total-value" id="totalDisplay">0 so'm</div>
+            </div>
         </div>
     </div>
 
     <div id="addForm">
-        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 6px;">
-            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
-            <input type="number" name="soni" placeholder="Soni" style="width: 50px; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
-            <input type="number" name="narxi" placeholder="Narxi" style="width: 90px; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+        <form action="/meva/qoshish" method="POST" style="display: flex; gap: 8px;">
+            <input type="text" name="nomi" placeholder="Meva nomi" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
+            <input type="number" name="soni" placeholder="Soni" style="width: 70px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
+            <input type="number" name="narxi" placeholder="Narxi" style="width: 120px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; font-weight: 700;" required>
             <button type="submit" class="btn-main">Saqlash</button>
         </form>
     </div>
@@ -160,11 +212,11 @@
         <table id="mevaTable">
             <thead>
                 <tr>
-                    <th style="width: 20px;"></th>
-                    <th>Nomi</th>
-                    <th style="width: 75px;">Soni</th>
-                    <th style="width: 100px;">Narxi (so'm)</th>
-                    <th style="width: 110px; text-align: right;">Amallar</th>
+                    <th style="width: 30px;"></th>
+                    <th>Meva nomi</th>
+                    <th style="width: 100px;">Soni</th>
+                    <th style="width: 140px;">Narxi (so'm)</th>
+                    <th style="width: 130px; text-align: right;">Amallar</th>
                 </tr>
             </thead>
             <tbody>
@@ -177,21 +229,21 @@
                                        data-count="<%= meva.soni %>"
                                        onchange="calculateTotal()">
                             </td>
-                            <td class="meva-name" style="font-weight: 600; color: #334155;"><%= meva.nomi %></td>
+                            <td class="meva-name" style="font-weight: 800; color: #0f172a;"><%= meva.nomi %></td>
                             <form action="/meva/tahrirlash/<%= meva.id %>" method="POST">
                                 <td><input type="number" name="soni" class="borderless-input" value="<%= meva.soni %>" required></td>
-                                <td><input type="number" name="narxi" class="borderless-input" style="width: 75px;" value="<%= meva.narxi %>" required></td>
+                                <td><input type="number" name="narxi" class="borderless-input" style="width: 110px;" value="<%= meva.narxi %>" required></td>
                                 <td>
                                     <div class="actions-group">
-                                        <button type="submit" class="btn-action-save">Edit</button>
-                                        <a href="/meva/ochirish/<%= meva.id %>" class="btn-action-del" onclick="return confirm('O\'chirilsinmi?')">Del</a>
+                                        <button type="submit" class="btn-emoji-edit" title="Saqlash">📝</button>
+                                        <a href="/meva/ochirish/<%= meva.id %>" class="btn-emoji-del" title="O'chirish" onclick="return confirm('O\'chirilsinmi?')">🗑️</a>
                                     </div>
                                 </td>
                             </form>
                         </tr>
                     <% }) %>
                 <% } else { %>
-                    <tr><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Mavjud emas.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 25px; color: #94a3b8; font-weight: 700;">Mavjud emas.</td></tr>
                 <% } %>
             </tbody>
         </table>
@@ -224,8 +276,7 @@
         document.getElementById('totalDisplay').innerText = total.toLocaleString('uz-UZ') + " so'm";
     }
 
-    // INTERAKTIV VA JIDDIY KLASSIK INTERFEYS RANGLARI
-    const ctx = document.getElementById('miniChart').getContext('2d');
+    // RANGLAR VA JONLI TASHQI TOOLTIP SOZLAMALARI
     const labels = [];
     const data = [];
     <% mevalar.forEach(m => { %>
@@ -233,40 +284,49 @@
         data.push(<%= m.soni %>);
     <% }) %>
 
+    const brightColors = ['#ff3838', '#ff9f43', '#2ed573', '#10ac84', '#00d2d3', '#54a0ff', '#5f27cd'];
+
+    // Dinamik tepadagi ro'yxatni (Legend) generatsiya qilish
+    const legendContainer = document.getElementById('chartLegend');
+    labels.forEach((label, index) => {
+        const color = brightColors[index % brightColors.length];
+        legendContainer.innerHTML += `
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: ${color}"></div>
+                <span>${label}</span>
+            </div>
+        `;
+    });
+
+    const ctx = document.getElementById('miniChart').getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
             datasets: [{
                 data: data,
-                // Premium pastel Corporate ranglar (neonlar butunlay olib tashlandi)
-                backgroundColor: ['#475569', '#0f766e', '#0284c7', '#4f46e5', '#b45309', '#65a30d', '#db2777'],
-                borderWidth: 1.5,
+                backgroundColor: brightColors,
+                borderWidth: 2,
                 borderColor: '#ffffff',
-                hoverOffset: 3
+                hoverOffset: 6
             }]
         },
         options: {
-            cutout: '65%',
+            cutout: '60%',
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 600 },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    enabled: true,
-                    backgroundColor: '#1e293b',
-                    titleColor: '#ffffff',
-                    bodyColor: '#ffffff',
-                    bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '500' },
-                    padding: 8,
-                    cornerRadius: 6,
-                    displayColors: false,
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.raw + ' ta';
-                        }
-                    }
+                    enabled: false // Ichki eski tool-tip o'chirildi
+                }
+            },
+            // Bo'lak bosilganda tashqaridagi blokni yangilash
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements.index;
+                    document.getElementById('infoFruitName').innerText = labels[index];
+                    document.getElementById('infoFruitCount').innerText = data[index] + " ta mavjud";
                 }
             }
         }
