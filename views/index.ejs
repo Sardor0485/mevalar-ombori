@@ -8,71 +8,261 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        .chart-container { position: relative; height: 300px; }
+    </style>
 </head>
-<body class="bg-slate-50 p-4 md:p-6">
-<div class="max-w-5xl mx-auto">
-    <div class="bg-white p-4 mb-6 rounded-xl shadow-sm border" style="height: 159px;">
-        <canvas id="mevaChart"></canvas>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen p-4 md:p-8">
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+            <i class="fa-solid fa-warehouse text-indigo-400"></i> Ombor Boshqaruvi
+        </h1>
+        <p class="text-slate-400">Mevalar va mahsulotlarni boshqarish tizimi</p>
     </div>
 
-    <div class="flex gap-2 mb-4 items-center">
-        <button onclick="document.getElementById('addForm').classList.toggle('hidden')" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 shadow-lg"><i class="fa-solid fa-plus"></i></button>
-        <input type="text" id="searchInput" placeholder="🔍 Qidirish..." class="p-2 border rounded-lg flex-1">
-        <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="fa-solid fa-file-excel"></i></button>
+    <!-- Stats & Chart Section -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <!-- Chart -->
+        <div class="md:col-span-2 bg-white rounded-2xl shadow-xl p-6 fade-in">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-indigo-600"></i> Mahsulot Taqsimi
+            </h2>
+            <div class="chart-container">
+                <canvas id="mevaChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="space-y-4 fade-in">
+            <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-indigo-100 text-sm">Jami Mahsulot</p>
+                        <p class="text-3xl font-bold" id="totalItems">0</p>
+                    </div>
+                    <i class="fa-solid fa-boxes text-indigo-200 text-4xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-emerald-100 text-sm">Umumiy Qiymat</p>
+                        <p class="text-2xl font-bold" id="totalValue">0</p>
+                    </div>
+                    <i class="fa-solid fa-coins text-emerald-200 text-4xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm">Turlar Soni</p>
+                        <p class="text-3xl font-bold" id="typesCount">0</p>
+                    </div>
+                    <i class="fa-solid fa-layer-group text-purple-200 text-4xl opacity-50"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <form id="addForm" action="/meva/qoshish" method="POST" class="hidden bg-white p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-2 border rounded-xl shadow-sm">
-        <input type="text" name="nomi" placeholder="Nomi" class="border p-2 rounded" required>
-        <input type="number" name="narxi" placeholder="Narxi" class="border p-2 rounded" required>
-        <input type="number" name="soni" placeholder="Soni" class="border p-2 rounded" required>
-        <button class="bg-indigo-600 text-white p-2 rounded">Saqlash</button>
+    <!-- Action Buttons -->
+    <div class="flex flex-col md:flex-row gap-3 mb-6 fade-in">
+        <button onclick="toggleAddForm()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-3 rounded-xl shadow-lg font-semibold transition-all flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Mahsulot Qo'shish
+        </button>
+        <input type="text" id="searchInput" placeholder="🔍 Mahsulot qidirish..." class="flex-1 px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-800 text-white placeholder-slate-400 focus:border-indigo-500 focus:outline-none transition-all">
+        <button onclick="exportToExcel()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-6 py-3 rounded-xl shadow-lg font-semibold transition-all flex items-center gap-2">
+            <i class="fa-solid fa-file-excel"></i> Excel
+        </button>
+    </div>
+
+    <!-- Add Form -->
+    <form id="addForm" action="/meva/qoshish" method="POST" class="hidden bg-white rounded-2xl shadow-xl p-6 mb-6 fade-in border-l-4 border-indigo-600">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle text-indigo-600"></i> Yangi Mahsulot Qo'shish
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-2">Mahsulot Nomi *</label>
+                <input type="text" name="nomi" placeholder="Masalan: Olma" class="w-full border-2 border-slate-300 p-3 rounded-lg focus:border-indigo-500 focus:outline-none transition-all" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-2">Narxi (so'm) *</label>
+                <input type="number" name="narxi" placeholder="5000" class="w-full border-2 border-slate-300 p-3 rounded-lg focus:border-indigo-500 focus:outline-none transition-all" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-2">Soni *</label>
+                <input type="number" name="soni" placeholder="10" class="w-full border-2 border-slate-300 p-3 rounded-lg focus:border-indigo-500 focus:outline-none transition-all" required>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white p-3 rounded-lg font-semibold transition-all shadow-lg">
+                    <i class="fa-solid fa-save"></i> Saqlash
+                </button>
+                <button type="button" onclick="toggleAddForm()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-semibold transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
     </form>
 
-    <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
-        <table class="w-full text-left" id="mevaTable">
-            <thead class="text-gray-400 text-xs uppercase border-b">
-                <tr><th class="p-3">Nomi</th><th class="p-3">Narxi</th><th class="p-3">Soni</th><th class="p-3">Amallar</th></tr>
-            </thead>
-            <tbody>
-                <% mevalar.forEach(m => { %>
-                <tr class="border-b hover:bg-slate-50 text-sm">
-                    <td class="p-3 font-semibold"><%= m.nomi %></td>
-                    <td class="p-3"><%= m.narxi %></td>
-                    <td class="p-3"><%= m.soni %></td>
-                    <td class="p-3 flex gap-4 text-lg">
-                        <button onclick="editItem('<%= m.id %>', '<%= m.soni %>', '<%= m.narxi %>')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>
-                        <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('O\'chirilsinmi?')" class="text-red-500"><i class="fa-solid fa-trash"></i></a>
-                    </td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
+    <!-- Table -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left" id="mevaTable">
+                <thead class="bg-gradient-to-r from-slate-700 to-slate-800 text-white text-xs uppercase font-bold tracking-wider">
+                    <tr>
+                        <th class="p-4"><i class="fa-solid fa-cube text-indigo-400 mr-2"></i> Nomi</th>
+                        <th class="p-4"><i class="fa-solid fa-tag text-emerald-400 mr-2"></i> Narxi</th>
+                        <th class="p-4"><i class="fa-solid fa-box text-purple-400 mr-2"></i> Soni</th>
+                        <th class="p-4"><i class="fa-solid fa-calculator text-orange-400 mr-2"></i> Jami Qiymat</th>
+                        <th class="p-4 text-center"><i class="fa-solid fa-sliders mr-2"></i> Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% mevalar.forEach((m, index) => { %>
+                    <tr class="border-b border-slate-200 hover:bg-indigo-50 transition-all text-sm">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                    <%= String.fromCharCode(65 + (index % 26)) %>
+                                </div>
+                                <span class="font-semibold text-gray-800"><%= m.nomi %></span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold"><%= Number(m.narxi).toLocaleString('uz-UZ') %> so'm</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-gray-700 font-semibold"><%= m.soni %> dona</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold"><%= (m.soni * m.narxi).toLocaleString('uz-UZ') %> so'm</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex gap-3 justify-center">
+                                <button onclick="editItem('<%= m.id %>', '<%= m.soni %>', '<%= m.narxi %>', '<%= m.nomi %>')" class="text-blue-500 hover:text-blue-700 hover:scale-110 transition-all p-2 rounded-lg hover:bg-blue-50" title="Tahrirlash">
+                                    <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                </button>
+                                <a href="/meva/ochirish/<%= m.id %>" onclick="return confirm('Bu mahsulotni o\'chirilsinmi?')" class="text-red-500 hover:text-red-700 hover:scale-110 transition-all p-2 rounded-lg hover:bg-red-50" title="O'chirish">
+                                    <i class="fa-solid fa-trash-can text-lg"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <% if (mevalar.length === 0) { %>
+            <div class="p-8 text-center">
+                <i class="fa-solid fa-inbox text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-lg">Hozircha mahsulot mavjud emas</p>
+            </div>
+            <% } %>
+        </div>
     </div>
 </div>
 
 <script>
-    new Chart(document.getElementById('mevaChart'), {
-        type: 'bar',
-        data: { labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>, datasets: [{ label: 'Soni', data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>, backgroundColor: '#6366f1' }] },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+    let chartInstance = null;
+
+    function initChart() {
+        const ctx = document.getElementById('mevaChart').getContext('2d');
+        const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4', '#f97316', '#14b8a6'];
+        
+        if (chartInstance) chartInstance.destroy();
+        
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: <%- JSON.stringify(mevalar.map(m => m.nomi)) %>,
+                datasets: [{
+                    label: 'Soni',
+                    data: <%- JSON.stringify(mevalar.map(m => m.soni)) %>,
+                    backgroundColor: colors.slice(0, <%- mevalar.length %>),
+                    borderColor: '#fff',
+                    borderWidth: 3,
+                    borderRadius: 8,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12, weight: 'bold' },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return `${context.label}: ${context.parsed} dona (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateStats() {
+        const data = <%- JSON.stringify(mevalar) %>;
+        const totalItems = data.reduce((sum, m) => sum + parseInt(m.soni), 0);
+        const totalValue = data.reduce((sum, m) => sum + (m.soni * m.narxi), 0);
+        
+        document.getElementById('totalItems').textContent = totalItems.toLocaleString('uz-UZ');
+        document.getElementById('totalValue').textContent = totalValue.toLocaleString('uz-UZ') + ' so\'m';
+        document.getElementById('typesCount').textContent = data.length;
+    }
+
+    function toggleAddForm() {
+        document.getElementById('addForm').classList.toggle('hidden');
+    }
 
     document.getElementById('searchInput').addEventListener('keyup', e => {
         const val = e.target.value.toLowerCase();
-        document.querySelectorAll('tbody tr').forEach(row => row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none');
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(val) ? '' : 'none';
+        });
     });
 
-    function editItem(id, soni, narxi) {
-        const nS = prompt("Yangi soni:", soni);
-        const nN = prompt("Yangi narxi:", narxi);
+    function editItem(id, soni, narxi, nomi) {
+        const nS = prompt(`"${nomi}" mahsulotning yangi sonini kiriting:`, soni);
+        if (nS === null) return;
+        
+        const nN = prompt(`"${nomi}" mahsulotning yangi narxini kiriting:`, narxi);
+        if (nN === null) return;
+        
         if (nS && nN) {
-            fetch(`/meva/tahrirlash/${id}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({soni: nS, narxi: nN}) }).then(() => location.reload());
+            fetch(`/meva/tahrirlash/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soni: parseInt(nS), narxi: parseInt(nN) })
+            }).then(() => location.reload());
         }
     }
 
     function exportToExcel() {
-        XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById('mevaTable')), "Ombor.xlsx");
+        XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById('mevaTable')), "Ombor_" + new Date().toLocaleDateString('uz-UZ') + ".xlsx");
     }
+
+    // Init
+    initChart();
+    updateStats();
 </script>
 </body>
 </html>
